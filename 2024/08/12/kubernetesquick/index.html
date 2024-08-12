@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>快速上手：kubernetes快速搭建 | 颗粒的运维手册</title><meta name="author" content="keli"><meta name="copyright" content="keli"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="项目目标（1）了解kubeasz开源项目；（2）熟练掌握kubernetes的快速搭建 项目准备规划节点   主机名 主机IP 节点规划    k8s-master 10.0.1.1 kube_master   k8s-node1 10.0.1.2 kube_node   k8s-node2 10.0.1.3 kube_node   基础准备系统镜像：CentOS 7.9安装包下载网址：https">
+<meta property="og:type" content="article">
+<meta property="og:title" content="快速上手：kubernetes快速搭建">
+<meta property="og:url" content="http://example.com/2024/08/12/kubernetesquick/index.html">
+<meta property="og:site_name" content="颗粒的运维手册">
+<meta property="og:description" content="项目目标（1）了解kubeasz开源项目；（2）熟练掌握kubernetes的快速搭建 项目准备规划节点   主机名 主机IP 节点规划    k8s-master 10.0.1.1 kube_master   k8s-node1 10.0.1.2 kube_node   k8s-node2 10.0.1.3 kube_node   基础准备系统镜像：CentOS 7.9安装包下载网址：https">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/avatar.png">
+<meta property="article:published_time" content="2024-08-12T02:26:28.007Z">
+<meta property="article:modified_time" content="2024-04-28T06:04:36.000Z">
+<meta property="article:author" content="keli">
+<meta property="article:tag" content="kubernetes入门">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/avatar.png"><link rel="shortcut icon" href="/img/icon.png"><link rel="canonical" href="http://example.com/2024/08/12/kubernetesquick/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '快速上手：kubernetes快速搭建',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-28 14:04:36'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="颗粒的运维手册"><span class="site-name">颗粒的运维手册</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">快速上手：kubernetes快速搭建</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-08-12T02:26:28.007Z" title="发表于 2024-08-12 10:26:28">2024-08-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-28T06:04:36.000Z" title="更新于 2024-04-28 14:04:36">2024-04-28</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/kubernetes/">kubernetes</a></span></div><div class="meta-secondline"></div></div></div><article class="post-content" id="article-container"><h2 id="项目目标"><a href="#项目目标" class="headerlink" title="项目目标"></a>项目目标</h2><p>（1）了解<a target="_blank" rel="noopener" href="https://github.com/easzlab/kubeasz"><strong>kubeasz</strong></a>开源项目；<br>（2）熟练掌握kubernetes的快速搭建</p>
+<h2 id="项目准备"><a href="#项目准备" class="headerlink" title="项目准备"></a>项目准备</h2><h4 id="规划节点"><a href="#规划节点" class="headerlink" title="规划节点"></a>规划节点</h4><table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>主机IP</th>
+<th>节点规划</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>k8s-master</td>
+<td>10.0.1.1</td>
+<td>kube_master</td>
+</tr>
+<tr>
+<td>k8s-node1</td>
+<td>10.0.1.2</td>
+<td>kube_node</td>
+</tr>
+<tr>
+<td>k8s-node2</td>
+<td>10.0.1.3</td>
+<td>kube_node</td>
+</tr>
+</tbody></table>
+<h4 id="基础准备"><a href="#基础准备" class="headerlink" title="基础准备"></a>基础准备</h4><p><strong>系统镜像</strong>：CentOS 7.9<br><strong>安装包下载网址：</strong><a target="_blank" rel="noopener" href="https://github.com/easzlab/kubeasz"><strong>https://github.com/easzlab/kubeasz</strong></a><br><strong>环境准备：</strong></p>
+<ul>
+<li><strong>服务器资源：</strong>确保你有至少三台服务器，每台服务器至少具备2核CPU、4GB内存和40GB硬盘。</li>
+<li><strong>网络配置：</strong>配置服务器的内网IP地址，确保它们在同一子网内，并且能够互相通信。</li>
+<li><strong>SSH免密登录：</strong>配置从部署节点能够SSH免密登录到所有节点。</li>
+</ul>
+<h2 id="项目实施"><a href="#项目实施" class="headerlink" title="项目实施"></a>项目实施</h2><h4 id="安装前的准备工作"><a href="#安装前的准备工作" class="headerlink" title="安装前的准备工作"></a>安装前的准备工作</h4><ul>
+<li><strong>安全组设置</strong>：在云服务提供商的安全组设置中，放通内网的ICMP协议，确保服务器之间可以互相PING通。</li>
+<li><strong>SSH免密登录</strong>：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br><span class="line">ssh-copy-id &lt;IP地址&gt;</span><br></pre></td></tr></table></figure>
+ 替换 <code>&lt;IP地址&gt;</code> 为所有节点的内网IP地址，按照提示输入yes和root密码。</li>
+</ul>
+<h4 id="安装Kubeasz工具"><a href="#安装Kubeasz工具" class="headerlink" title="安装Kubeasz工具"></a>安装Kubeasz工具</h4><ul>
+<li><p><strong>下载安装脚本</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> release=3.5.0</span><br><span class="line">wget https://github.com/easzlab/kubeasz/releases/download/<span class="variable">$&#123;release&#125;</span>/ezdown</span><br><span class="line"><span class="built_in">chmod</span> +x ./ezdown</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>下载Kubeasz代码和二进制文件</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./ezdown -D</span><br></pre></td></tr></table></figure>
+<p> <code>-D</code> 参数表示下载默认的Kubeasz代码和二进制文件。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">./ezdown</span> <span class="string">-S</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="创建Kubernetes集群"><a href="#创建Kubernetes集群" class="headerlink" title="创建Kubernetes集群"></a>创建Kubernetes集群</h4><ul>
+<li><strong>容器化运行Kubeasz</strong>：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it kubeasz ezctl new &lt;集群名称&gt;</span><br></pre></td></tr></table></figure>
+ 替换 <code>&lt;集群名称&gt;</code> 为你想要的集群名称，例如 <code>k8s-01</code>。</li>
+</ul>
+<h4 id="配置集群"><a href="#配置集群" class="headerlink" title="配置集群"></a>配置集群</h4><ul>
+<li><strong>修改集群配置文件</strong>：<br>编辑 <code>/etc/kubeasz/clusters/&lt;集群名称&gt;/hosts</code> 文件，设置集群节点的IP地址。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[etcd]</span><br><span class="line">10.0.1.1</span><br><span class="line">10.0.1.2</span><br><span class="line">10.0.1.3</span><br><span class="line"></span><br><span class="line">[kube_master]</span><br><span class="line">10.0.1.1</span><br><span class="line"></span><br><span class="line">[kube_node]</span><br><span class="line">10.0.1.2</span><br><span class="line">10.0.1.3</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="安装Kubernetes集群"><a href="#安装Kubernetes集群" class="headerlink" title="安装Kubernetes集群"></a>安装Kubernetes集群</h4><ul>
+<li><p><strong>建议配置别名</strong>，方便执行命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;alias dk=&#x27;docker exec -it kubeasz&#x27;&quot;</span> &gt;&gt; /root/.bashrc</span><br><span class="line"><span class="built_in">source</span> /root/.bashrc</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>一键安装集群</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dk ezctl setup &lt;集群名称&gt; all</span><br></pre></td></tr></table></figure>
+<p> 替换 <code>&lt;集群名称&gt;</code> 为你在步骤4中创建的集群名称。</p>
+</li>
+</ul>
+<h4 id="验证安装"><a href="#验证安装" class="headerlink" title="验证安装"></a>验证安装</h4><ul>
+<li><p>应用环境变量：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">source</span> <span class="string">~/.bashrc</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>验证集群版本</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl version</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>验证节点状态</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl get node</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>验证Pod状态</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl get pod -A</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>验证服务状态</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl get svc -A</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="项目总结"><a href="#项目总结" class="headerlink" title="项目总结"></a>项目总结</h2><p> 本博客详细描述了使用开源项目kubeasz快速搭建kubernetes，适合新手快速的上手哦！</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">keli</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2024/08/12/kubernetesquick/">http://example.com/2024/08/12/kubernetesquick/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">颗粒的运维手册</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/kubernetes%E5%85%A5%E9%97%A8/">kubernetes入门</a></div><div class="post_share"><div class="social-share" data-image="/img/avatar.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/08/12/metabase_install/" title="metabase部署与实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">metabase部署与实践</div></div></a></div><div class="next-post pull-right"><a href="/2024/08/12/Fastapi_start/" title="Python web：Fastapi快速入门"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Python web：Fastapi快速入门</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">keli</div><div class="author-info__description">运维手记</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">练习时长两年半</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E7%9B%AE%E6%A0%87"><span class="toc-text">项目目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E5%87%86%E5%A4%87"><span class="toc-text">项目准备</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%84%E5%88%92%E8%8A%82%E7%82%B9"><span class="toc-text">规划节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E5%87%86%E5%A4%87"><span class="toc-text">基础准备</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%96%BD"><span class="toc-text">项目实施</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E5%89%8D%E7%9A%84%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-text">安装前的准备工作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85Kubeasz%E5%B7%A5%E5%85%B7"><span class="toc-text">安装Kubeasz工具</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAKubernetes%E9%9B%86%E7%BE%A4"><span class="toc-text">创建Kubernetes集群</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%9B%86%E7%BE%A4"><span class="toc-text">配置集群</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85Kubernetes%E9%9B%86%E7%BE%A4"><span class="toc-text">安装Kubernetes集群</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E5%AE%89%E8%A3%85"><span class="toc-text">验证安装</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93"><span class="toc-text">项目总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/08/12/MySQL_install/" title="MySQL 8.0的三种安装方式">MySQL 8.0的三种安装方式</a><time datetime="2024-08-12T02:26:28.014Z" title="发表于 2024-08-12 10:26:28">2024-08-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/08/12/superset_install/" title="superset部署与实践">superset部署与实践</a><time datetime="2024-08-12T02:26:28.014Z" title="发表于 2024-08-12 10:26:28">2024-08-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/08/12/python_50/" title="python编程50例">python编程50例</a><time datetime="2024-08-12T02:26:28.014Z" title="发表于 2024-08-12 10:26:28">2024-08-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/08/12/superset_pk_metabase/" title="superset与metabase调研比较">superset与metabase调研比较</a><time datetime="2024-08-12T02:26:28.014Z" title="发表于 2024-08-12 10:26:28">2024-08-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/08/12/python_spider_new/" title="Python实时爬虫：自动抓取并推送学校最新通知">Python实时爬虫：自动抓取并推送学校最新通知</a><time datetime="2024-08-12T02:26:28.014Z" title="发表于 2024-08-12 10:26:28">2024-08-12</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By keli</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
