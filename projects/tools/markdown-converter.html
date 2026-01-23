@@ -110,14 +110,14 @@
 
     .split-pane {
       flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       background: var(--border);
-      gap: 1px;
       overflow: hidden;
     }
 
     #markdown-input {
+      flex: 1;
+      min-width: 200px;
       background: var(--editor-bg);
       color: var(--text-primary);
       padding: 28px;
@@ -131,16 +131,40 @@
       overflow-y: auto;
     }
 
-    #markdown-input:focus {
-      background: var(--bg-primary);
+    /* 分隔条 */
+    .splitter {
+      width: 8px;
+      background: var(--accent-light);
+      cursor: col-resize;
+      position: relative;
+      z-index: 10;
+      transition: background 0.2s ease;
     }
 
-    #markdown-input::placeholder {
-      color: var(--text-muted);
-      font-style: italic;
+    .splitter:hover {
+      background: var(--accent);
+    }
+
+    .splitter::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 2px;
+      height: 24px;
+      background: var(--accent-dark);
+      border-radius: 1px;
+      opacity: 0.5;
+    }
+
+    .splitter:active {
+      background: var(--accent);
     }
 
     .preview-container {
+      flex: 1;
+      min-width: 200px;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -365,6 +389,7 @@
     </div>
     <div class="split-pane">
       <textarea id="markdown-input" placeholder="在此输入 Markdown..."></textarea>
+      <div class="splitter" id="splitter"></div>
       <div class="preview-container">
         <div id="html-preview"></div>
         <button class="copy-btn" id="copyBtn">
@@ -437,6 +462,57 @@
     });
 
     copyBtn.addEventListener('click', copyToClipboard);
+
+    // 分隔条拖拽功能
+    const splitter = document.getElementById('splitter');
+    const splitPane = document.querySelector('.split-pane');
+
+    let isDragging = false;
+    let startX = 0;
+    let startWidthLeft = 0;
+    let startWidthRight = 0;
+
+    splitter.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      startWidthLeft = inputEl.offsetWidth;
+      startWidthRight = document.querySelector('.preview-container').offsetWidth;
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+
+      const deltaX = e.clientX - startX;
+      const totalWidth = splitPane.offsetWidth;
+      const splitterWidth = splitter.offsetWidth;
+
+      // 计算新宽度百分比
+      const newLeftWidth = startWidthLeft + deltaX;
+      const newRightWidth = startWidthRight - deltaX;
+
+      // 设置最小宽度限制
+      const minWidth = 200;
+      if (newLeftWidth < minWidth || newRightWidth < minWidth) return;
+
+      // 使用百分比让响应式更好
+      const leftPercent = (newLeftWidth / totalWidth) * 100;
+      const rightPercent = (newRightWidth / totalWidth) * 100;
+
+      inputEl.style.flex = 'none';
+      inputEl.style.width = leftPercent + '%';
+      document.querySelector('.preview-container').style.flex = 'none';
+      document.querySelector('.preview-container').style.width = rightPercent + '%';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    });
 
     // Initial content
     inputEl.value = `# 欢迎使用 Markdown
