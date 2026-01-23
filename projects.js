@@ -31,13 +31,6 @@ const projects = [
     tags: [{ text: "工具", new: false }]
   },
   {
-    title: "密码生成器 (Brutalist)",
-    url: "projects/tools/password-generator-brutalist.html",
-    icon: "🔒",
-    desc: "极简主义风格的密码生成器",
-    tags: [{ text: "实验性", new: false }]
-  },
-  {
     title: "Markdown Converter",
     url: "projects/tools/markdown-converter.html",
     icon: "📝",
