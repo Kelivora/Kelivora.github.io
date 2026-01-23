@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>计算器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #faf9f7;
+      --bg-secondary: #f5f3f0;
+      --bg-tertiary: #efeae5;
+      --text-primary: #1a1a18;
+      --text-secondary: #8a8a83;
+      --text-muted: #aca9a2;
+      --accent: #c4a574;
+      --accent-light: #e8dcc8;
+      --accent-dark: #a08050;
+      --operator-bg: #f5f3f0;
+      --operator-hover: #efeae5;
+      --equals-bg: linear-gradient(135deg, #c4a574 0%, #a08050 100%);
+      --equals-hover: linear-gradient(135deg, #d4b584 0%, #b09060 100%);
+      --border: rgba(0, 0, 0, 0.06);
+      --border-subtle: rgba(0, 0, 0, 0.04);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --shadow-glow: 0 0 40px rgba(196, 165, 116, 0.2);
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 28px;
+      --font-display: 'Noto Serif SC', Georgia, serif;
+      --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Outfit', 'SF Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(196, 165, 116, 0.03), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(196, 165, 116, 0.02), transparent);
+    }
+
+    .nav-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 24px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 400;
+      transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover {
+      color: var(--accent);
+    }
+
+    .nav-link svg {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover svg {
+      transform: translateX(-2px);
+    }
+
+    .calculator {
+      width: 100%;
+      max-width: 380px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+      border: 1px solid var(--border-subtle);
+      position: relative;
+    }
+
+    .calculator::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      padding: 1px;
+      background: linear-gradient(135deg, var(--accent-light) 0%, transparent 50%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .display-section {
+      background: var(--bg-primary);
+      padding: 40px 28px 28px;
+      text-align: right;
+      position: relative;
+    }
+
+    .display-section::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 28px;
+      right: 28px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+    }
+
+    .expression {
+      font-size: 14px;
+      color: var(--text-muted);
+      min-height: 20px;
+      margin-bottom: 8px;
+      word-wrap: break-word;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: var(--font-body);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    .expression .operator {
+      color: var(--accent);
+      margin: 0 2px;
+      font-weight: 500;
+    }
+
+    .result {
+      font-family: var(--font-mono);
+      font-size: 52px;
+      font-weight: 600;
+      color: var(--text-primary);
+      word-wrap: break-word;
+      line-height: 1.1;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: -0.02em;
+    }
+
+    .result.overflow {
+      font-size: 36px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 0 20px 24px;
+    }
+
+    .btn {
+      padding: 20px 16px;
+      font-family: var(--font-body);
+      font-size: 22px;
+      font-weight: 500;
+      background: var(--operator-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn:hover {
+      background: var(--operator-hover);
+      border-color: var(--accent-light);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn.operator {
+      background: var(--bg-primary);
+      color: var(--accent);
+      font-size: 26px;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn.operator:hover {
+      background: var(--accent-light);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn.operator.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .btn.equals {
+      background: var(--equals-bg);
+      color: white;
+      font-weight: 600;
+      font-size: 26px;
+      border: none;
+      box-shadow: 0 4px 16px rgba(196, 165, 116, 0.3);
+    }
+
+    .btn.equals:hover {
+      background: var(--equals-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(196, 165, 116, 0.4);
+    }
+
+    .btn.equals:active {
+      transform: translateY(0) scale(0.96);
+    }
+
+    .btn.clear {
+      color: #c45c5c;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn.clear:hover {
+      background: #fef5f5;
+      border-color: rgba(196, 92, 92, 0.2);
+    }
+
+    .btn.function {
+      font-size: 16px;
+      color: var(--text-secondary);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-sm);
+      font-weight: 500;
+    }
+
+    .btn.function:hover {
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      border-color: var(--accent-light);
+    }
+
+    .history-panel {
+      padding: 20px 20px;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-secondary);
+    }
+
+    .history-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: var(--font-body);
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-xs);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .history-item:hover {
+      transform: translateX(4px);
+      border-color: var(--accent-light);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .history-expr {
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+    }
+
+    .history-result {
+      color: var(--accent);
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .empty-history {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 12px;
+      font-style: italic;
+    }
+
+    @media (max-width: 420px) {
+      .calculator {
+        max-width: 100%;
+      }
+
+      .buttons {
+        gap: 8px;
+        padding: 0 16px 16px;
+      }
+
+      .btn {
+        padding: 18px 12px;
+        font-size: 20px;
+      }
+
+      .btn.operator {
+        font-size: 22px;
+      }
+
+      .btn.equals {
+        font-size: 22px;
+      }
+
+      .result {
+        font-size: 44px;
+      }
+
+      .display-section {
+        padding: 32px 24px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav-header">
+    <a href="/index.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      返回首页
+    </a>
+  </nav>
+
+  <div class="calculator">
+    <div class="display-section">
+      <div class="expression" id="expression"></div>
+      <div class="result" id="result">0</div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn clear" onclick="clearAll()">AC</button>
+      <button class="btn function" onclick="toggleSign()">±</button>
+      <button class="btn function" onclick="percent()">%</button>
+      <button class="btn operator" data-op="/" onclick="setOperator('/')">÷</button>
+
+      <button class="btn" onclick="appendNumber('7')">7</button>
+      <button class="btn" onclick="appendNumber('8')">8</button>
+      <button class="btn" onclick="appendNumber('9')">9</button>
+      <button class="btn operator" data-op="*" onclick="setOperator('*')">×</button>
+
+      <button class="btn" onclick="appendNumber('4')">4</button>
+      <button class="btn" onclick="appendNumber('5')">5</button>
+      <button class="btn" onclick="appendNumber('6')">6</button>
+      <button class="btn operator" data-op="-" onclick="setOperator('-')">−</button>
+
+      <button class="btn" onclick="appendNumber('1')">1</button>
+      <button class="btn" onclick="appendNumber('2')">2</button>
+      <button class="btn" onclick="appendNumber('3')">3</button>
+      <button class="btn operator" data-op="+" onclick="setOperator('+')">+</button>
+
+      <button class="btn" onclick="appendNumber('0')" style="grid-column: span 2">0</button>
+      <button class="btn" onclick="appendDecimal()">.</button>
+      <button class="btn equals" onclick="calculate()">=</button>
+    </div>
+
+    <div class="history-panel">
+      <div class="history-title">计算历史</div>
+      <div class="history-list" id="historyList">
+        <div class="empty-history">暂无记录</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentNumber = '0';
+    let previousNumber = '';
+    let operator = '';
+    let shouldResetDisplay = false;
+    let history = JSON.parse(localStorage.getItem('calculatorHistory') || '[]');
+
+    const expressionEl = document.getElementById('expression');
+    const resultEl = document.getElementById('result');
+    const historyListEl = document.getElementById('historyList');
+
+    const operatorMap = {
+      '+': '+',
+      '-': '−',
+      '*': '×',
+      '/': '÷'
+    };
+
+    function updateDisplay() {
+      const displayNum = formatNumber(currentNumber);
+
+      if (displayNum.length > 10) {
+        resultEl.classList.add('overflow');
+      } else {
+        resultEl.classList.remove('overflow');
+      }
+
+      resultEl.textContent = displayNum;
+
+      if (previousNumber && operator) {
+        const opSymbol = operatorMap[operator] || operator;
+        expressionEl.innerHTML = `${formatNumber(previousNumber)} <span class="operator">${opSymbol}</span>`;
+      } else {
+        expressionEl.textContent = '';
+      }
+    }
+
+    function formatNumber(num) {
+      if (num === '' || num === '-') return num;
+
+      const n = parseFloat(num);
+      if (isNaN(n)) return 'Error';
+
+      if (Math.abs(n) >= 1e10 || (Math.abs(n) < 1e-6 && n !== 0)) {
+        return n.toExponential(6);
+      }
+
+      const str = n.toString();
+      if (str.includes('.')) {
+        return str.replace(/0+$/, '').replace(/\.$/, '');
+      }
+      return str;
+    }
+
+    function appendNumber(num) {
+      if (shouldResetDisplay) {
+        currentNumber = num;
+        shouldResetDisplay = false;
+      } else {
+        if (currentNumber === '0' && num !== '0') {
+          currentNumber = num;
+        } else if (currentNumber.length < 15) {
+          currentNumber += num;
+        }
+      }
+      updateDisplay();
+    }
+
+    function appendDecimal() {
+      if (shouldResetDisplay) {
+        currentNumber = '0.';
+        shouldResetDisplay = false;
+      } else if (!currentNumber.includes('.')) {
+        currentNumber += '.';
+      }
+      updateDisplay();
+    }
+
+    function setOperator(op) {
+      if (operator && previousNumber && !shouldResetDisplay) {
+        calculate();
+      } else {
+        previousNumber = currentNumber;
+      }
+      operator = op;
+      shouldResetDisplay = true;
+      updateActiveOperator();
+      updateDisplay();
+    }
+
+    function calculate() {
+      if (!operator || !previousNumber) return;
+
+      const prev = parseFloat(previousNumber);
+      const current = parseFloat(currentNumber);
+
+      let result;
+      switch (operator) {
+        case '+': result = prev + current; break;
+        case '-': result = prev - current; break;
+        case '*': result = prev * current; break;
+        case '/': result = current !== 0 ? prev / current : 'Error'; break;
+        default: return;
+      }
+
+      if (result === 'Error') {
+        expressionEl.textContent = `${formatNumber(previousNumber)} ${operatorMap[operator]} ${formatNumber(currentNumber)}`;
+        resultEl.textContent = 'Error';
+        addToHistory(`${formatNumber(previousNumber)} ${operatorMap[operator]} ${formatNumber(currentNumber)}`, 'Error');
+        clearAll(false);
+        return;
+      }
+
+      const expr = `${formatNumber(previousNumber)} ${operatorMap[operator]} ${formatNumber(currentNumber)}`;
+      addToHistory(expr, formatNumber(result));
+
+      currentNumber = result.toString();
+      previousNumber = '';
+      operator = '';
+      shouldResetDisplay = true;
+      updateActiveOperator();
+      updateDisplay();
+    }
+
+    function clearAll(resetHistory = true) {
+      currentNumber = '0';
+      previousNumber = '';
+      operator = '';
+      shouldResetDisplay = false;
+      updateActiveOperator();
+      updateDisplay();
+    }
+
+    function toggleSign() {
+      if (currentNumber === '0') return;
+      currentNumber = (parseFloat(currentNumber) * -1).toString();
+      updateDisplay();
+    }
+
+    function percent() {
+      currentNumber = (parseFloat(currentNumber) / 100).toString();
+      updateDisplay();
+    }
+
+    function updateActiveOperator() {
+      document.querySelectorAll('.btn.operator').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.op === operator) {
+          btn.classList.add('active');
+        }
+      });
+    }
+
+    function addToHistory(expr, result) {
+      history.unshift({ expr, result, time: Date.now() });
+      history = history.slice(0, 10);
+      localStorage.setItem('calculatorHistory', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      if (history.length === 0) {
+        historyListEl.innerHTML = '<div class="empty-history">暂无记录</div>';
+        return;
+      }
+
+      historyListEl.innerHTML = history.map((item, index) => `
+        <div class="history-item" onclick="useResult(${index})">
+          <span class="history-expr">${item.expr}</span>
+          <span class="history-result">= ${item.result}</span>
+        </div>
+      `).join('');
+    }
+
+    function useResult(index) {
+      const item = history[index];
+      currentNumber = item.result.replace(/,/g, '');
+      shouldResetDisplay = true;
+      operator = '';
+      previousNumber = '';
+      updateActiveOperator();
+      updateDisplay();
+    }
+
+    function clearHistory() {
+      history = [];
+      localStorage.removeItem('calculatorHistory');
+      renderHistory();
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+      if (e.target.matches('input')) return;
+
+      if (e.key >= '0' && e.key <= '9') {
+        appendNumber(e.key);
+      } else if (e.key === '.') {
+        appendDecimal();
+      } else if (e.key === '+') {
+        setOperator('+');
+      } else if (e.key === '-') {
+        setOperator('-');
+      } else if (e.key === '*') {
+        setOperator('*');
+      } else if (e.key === '/') {
+        e.preventDefault();
+        setOperator('/');
+      } else if (e.key === 'Enter' || e.key === '=') {
+        e.preventDefault();
+        calculate();
+      } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
+        clearAll();
+      } else if (e.key === '%') {
+        percent();
+      } else if (e.key === 'Backspace') {
+        if (currentNumber.length > 1 && currentNumber !== 'Error') {
+          currentNumber = currentNumber.slice(0, -1);
+        } else {
+          currentNumber = '0';
+        }
+        updateDisplay();
+      }
+    });
+
+    // Long press AC to clear history
+    let acLongPress;
+    const acBtn = document.querySelector('.btn.function');
+    acBtn.addEventListener('click', () => {
+      if (currentNumber === '0' && previousNumber === '' && operator === '') {
+        clearHistory();
+      } else {
+        clearAll();
+      }
+    });
+
+    renderHistory();
+    updateDisplay();
+  </script>
+</body>
+</html>

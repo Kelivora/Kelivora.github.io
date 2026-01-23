@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>项目集合</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* 主色调 - 温暖的米白基底 */
+      --bg-primary: #faf9f7;
+      --bg-secondary: #f5f3f0;
+      --bg-tertiary: #efeae5;
+
+      /* 文字颜色 - 高级灰 */
+      --text-primary: #1a1a18;
+      --text-secondary: #5c5c57;
+      --text-muted: #8a8a83;
+
+      /* 强调色 - 精致的琥珀金 */
+      --accent: #c4a574;
+      --accent-light: #e8dcc8;
+      --accent-dark: #a08050;
+
+      /* 功能色 */
+      --success: #4a7c59;
+      --warning: #d4a574;
+      --danger: #c45c5c;
+
+      /* 质感 */
+      --border: rgba(0, 0, 0, 0.06);
+      --border-subtle: rgba(0, 0, 0, 0.04);
+      --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.08);
+      --shadow-glow: 0 0 40px rgba(196, 165, 116, 0.15);
+
+      /* 圆角 */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-xl: 32px;
+
+      /* 字体 */
+      --font-display: 'Noto Serif SC', Georgia, serif;
+      --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* 背景纹理 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(196, 165, 116, 0.03), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(196, 165, 116, 0.02), transparent),
+        radial-gradient(ellipse 60% 40% at 20% 80%, rgba(196, 165, 116, 0.02), transparent);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px 120px;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 80px;
+      position: relative;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 500px;
+      margin: 0 auto;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    /* Search */
+    .search-wrapper {
+      max-width: 480px;
+      margin: 0 auto 60px;
+      position: relative;
+    }
+
+    .search-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      background: var(--accent);
+      border-radius: var(--radius-xl);
+      opacity: 0;
+      filter: blur(30px);
+      transition: opacity 0.5s ease;
+    }
+
+    .search-wrapper:focus-within::before {
+      opacity: 0.15;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 20px 28px 20px 56px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: var(--font-body);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    .search-input:focus {
+      outline: none;
+      background: var(--bg-primary);
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md), 0 0 0 4px rgba(196, 165, 116, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-muted);
+      stroke-width: 1.5;
+      fill: none;
+      transition: stroke 0.3s ease;
+    }
+
+    .search-input:focus + .search-icon,
+    .search-wrapper:focus-within .search-icon {
+      stroke: var(--accent);
+    }
+
+    /* Section */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -17px;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .section-count {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      background: var(--bg-secondary);
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+
+    /* Grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    /* Card */
+    .project-card {
+      display: block;
+      background: var(--bg-primary);
+      padding: 32px;
+      border-radius: var(--radius-lg);
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid var(--border-subtle);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent-light) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .project-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      padding: 1px;
+      background: linear-gradient(135deg, var(--accent) 0%, transparent 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+    }
+
+    .project-card:hover::before {
+      opacity: 0.4;
+    }
+
+    .project-card:hover::after {
+      opacity: 1;
+    }
+
+    .project-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .project-icon {
+      font-size: 2.4rem;
+      line-height: 1;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .project-card:hover .project-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .project-arrow {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 1rem;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-left: 12px;
+      flex-shrink: 0;
+    }
+
+    .project-card:hover .project-arrow {
+      background: var(--accent);
+      color: white;
+      transform: translateX(4px) scale(1.1);
+    }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: 0.01em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .project-desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .project-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      padding: 6px 14px;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      color: var(--text-muted);
+      font-weight: 400;
+      transition: all 0.3s ease;
+    }
+
+    .tag.new {
+      background: linear-gradient(135deg, var(--accent-light), rgba(196, 165, 116, 0.2));
+      color: var(--accent-dark);
+      font-weight: 500;
+    }
+
+    .project-card:hover .tag {
+      background: var(--bg-tertiary);
+    }
+
+    .project-card:hover .tag.new {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* No Results */
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 100px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 300;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 400;
+      position: relative;
+    }
+
+    footer a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    footer a:hover::after {
+      transform: scaleX(1);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .project-card {
+      animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      opacity: 0;
+    }
+
+    .project-card:nth-child(1) { animation-delay: 0.1s; }
+    .project-card:nth-child(2) { animation-delay: 0.15s; }
+    .project-card:nth-child(3) { animation-delay: 0.2s; }
+    .project-card:nth-child(4) { animation-delay: 0.25s; }
+    .project-card:nth-child(5) { animation-delay: 0.3s; }
+    .project-card:nth-child(6) { animation-delay: 0.35s; }
+    .project-card:nth-child(7) { animation-delay: 0.4s; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 60px 24px 80px;
+      }
+
+      h1 {
+        font-size: 2.4rem;
+      }
+
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>项目集合</h1>
+      <p class="subtitle">精选的工具与实验，点击即可体验</p>
+    </header>
+
+    <div class="search-wrapper">
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索项目..." />
+      <svg class="search-icon" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </div>
+
+    <section id="projectsSection">
+      <div class="section-header">
+        <h2 class="section-title">全部项目</h2>
+        <span class="section-count" id="projectCount">0 个项目</span>
+      </div>
+      <div class="projects-grid" id="projectsGrid"></div>
+    </section>
+
+    <footer>
+      <span>用心打造</span>
+      <span>·</span>
+      <a href="projects.js">编辑 projects.js 添加新项目</a>
+    </footer>
+  </div>
+
+  <script src="projects.js"></script>
+  <script>
+    const grid = document.getElementById('projectsGrid');
+    const count = document.getElementById('projectCount');
+    const searchInput = document.getElementById('searchInput');
+
+    function renderProjects(projects, filter = '') {
+      const filtered = filter
+        ? projects.filter(p =>
+            p.title.toLowerCase().includes(filter.toLowerCase()) ||
+            p.desc.toLowerCase().includes(filter.toLowerCase())
+          )
+        : projects;
+
+      count.textContent = `${filtered.length} 个项目`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="no-results">
+            <p>没有找到匹配 "${filter}" 的项目</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map((p, i) => `
+        <a href="${p.url}" class="project-card">
+          <div class="project-header">
+            <span class="project-icon">${p.icon}</span>
+            <span class="project-arrow">→</span>
+          </div>
+          <h3 class="project-title">${p.title}</h3>
+          <p class="project-desc">${p.desc}</p>
+          ${p.tags ? `
+            <div class="project-tags">
+              ${p.tags.map(t => `<span class="tag${t.new ? ' new' : ''}">${t.text}</span>`).join('')}
+            </div>
+          ` : ''}
+        </a>
+      `).join('');
+    }
+
+    searchInput.addEventListener('input', (e) => renderProjects(projects, e.target.value));
+
+    // Keyboard shortcut
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+
+    renderProjects(projects);
+  </script>
+</body>
+</html>

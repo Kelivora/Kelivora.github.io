@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(skill-creator)",
+      "Bash(python3 .claude/scripts/init_skill.py:*)",
+      "Bash(python3:*)",
+      "Skill(frontend-design)",
+      "Bash(npm install)",
+      "Bash(npm run dev:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)",
+      "Bash(curl:*)",
+      "Bash(tree:*)",
+      "Bash(netstat:*)",
+      "Bash(cat:*)",
+      "Skill(superpowers:writing-plans)"
+    ]
+  }
+}

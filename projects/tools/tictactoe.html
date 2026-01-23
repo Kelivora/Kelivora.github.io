@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>井字棋 - Tic Tac Toe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #faf9f7;
+      --bg-secondary: #f5f3f0;
+      --bg-tertiary: #efeae5;
+      --text-primary: #1a1a18;
+      --text-secondary: #8a8a83;
+      --text-muted: #aca9a2;
+      --accent: #c4a574;
+      --accent-light: #e8dcc8;
+      --accent-dark: #a08050;
+      --accent-x: #c45c5c;
+      --accent-o: #4a7c59;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-subtle: rgba(0, 0, 0, 0.04);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --shadow-glow: 0 0 40px rgba(196, 165, 116, 0.15);
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 28px;
+      --font-display: 'Noto Serif SC', Georgia, serif;
+      --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Outfit', 'SF Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(196, 165, 116, 0.03), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(196, 165, 116, 0.02), transparent);
+    }
+
+    .nav-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 24px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 400;
+      transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover {
+      color: var(--accent);
+    }
+
+    .nav-link svg {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover svg {
+      transform: translateX(-2px);
+    }
+
+    .game-container {
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .game-header h1 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 28px;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+    }
+
+    .mode-switch {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 14px 20px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .mode-btn:hover {
+      border-color: var(--accent-light);
+      color: var(--accent-dark);
+      transform: translateY(-2px);
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, #c4a574 0%, #a08050 100%);
+      color: white;
+      border-color: var(--accent);
+      box-shadow: 0 4px 16px rgba(196, 165, 116, 0.3);
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 32px;
+    }
+
+    .score-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 18px 28px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md), var(--shadow-glow);
+      border: 1px solid var(--border-subtle);
+      min-width: 90px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+    }
+
+    .player-x, .player-o {
+      font-family: var(--font-mono);
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .player-x { color: var(--accent-x); }
+
+    .player-o { color: var(--accent-o); }
+
+    .score {
+      font-family: var(--font-mono);
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .score-divider {
+      font-size: 1.6rem;
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 0 auto 28px;
+      max-width: 320px;
+      padding: 20px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+      border: 1px solid var(--border-subtle);
+      position: relative;
+    }
+
+    .board::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-md);
+      padding: 1px;
+      background: linear-gradient(135deg, var(--accent-light) 0%, transparent 50%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 2.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cell:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      transform: scale(1.02);
+    }
+
+    .cell.x {
+      color: var(--accent-x);
+      animation: popIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cell.o {
+      color: var(--accent-o);
+      animation: popIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cell.winning {
+      animation: pulse 0.8s ease infinite;
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+      50% { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    .status {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      min-height: 32px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .restart-btn {
+      padding: 16px 36px;
+      background: linear-gradient(135deg, #c4a574 0%, #a08050 100%);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 16px rgba(196, 165, 116, 0.3);
+      letter-spacing: 0.02em;
+    }
+
+    .restart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(196, 165, 116, 0.4);
+    }
+
+    .restart-btn:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 400px) {
+      .cell { font-size: 2.2rem; }
+
+      .score-item {
+        padding: 14px 20px;
+        min-width: 80px;
+      }
+
+      .score {
+        font-size: 1.8rem;
+      }
+
+      .board {
+        max-width: 280px;
+        gap: 8px;
+        padding: 16px;
+      }
+
+      .game-header h1 {
+        font-size: 1.7rem;
+      }
+
+      .mode-btn {
+        padding: 12px 16px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav-header">
+    <a href="/index.html" class="nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      返回首页
+    </a>
+  </nav>
+
+  <div class="game-container">
+    <header class="game-header">
+      <h1>井字棋</h1>
+      <div class="mode-switch">
+        <button class="mode-btn active" data-mode="pvp">双人对战</button>
+        <button class="mode-btn" data-mode="ai">人机对战</button>
+      </div>
+    </header>
+
+    <div class="score-board">
+      <div class="score-item">
+        <span class="player-x">X</span>
+        <span class="score" id="scoreX">0</span>
+      </div>
+      <div class="score-divider">-</div>
+      <div class="score-item">
+        <span class="player-o">O</span>
+        <span class="score" id="scoreO">0</span>
+      </div>
+    </div>
+
+    <div class="board" id="board">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div>
+      <div class="cell" data-index="7"></div>
+      <div class="cell" data-index="8"></div>
+    </div>
+
+    <div class="status" id="status">X 的回合</div>
+    <button class="restart-btn" id="restartBtn">重新开始</button>
+  </div>
+
+  <script>
+    const board = document.getElementById('board');
+    const cells = document.querySelectorAll('.cell');
+    const statusEl = document.getElementById('status');
+    const restartBtn = document.getElementById('restartBtn');
+    const scoreX = document.getElementById('scoreX');
+    const scoreO = document.getElementById('scoreO');
+    const modeBtns = document.querySelectorAll('.mode-btn');
+
+    let gameState = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let gameMode = 'pvp';
+    let gameActive = true;
+    let scores = { X: 0, O: 0 };
+
+    const winPatterns = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // cols
+      [0, 4, 8], [2, 4, 6]             // diagonals
+    ];
+
+    // Load scores from localStorage
+    function loadScores() {
+      const saved = localStorage.getItem('tictactoeScores');
+      if (saved) scores = JSON.parse(saved);
+      updateScoreDisplay();
+    }
+
+    function saveScores() {
+      localStorage.setItem('tictactoeScores', JSON.stringify(scores));
+    }
+
+    function updateScoreDisplay() {
+      scoreX.textContent = scores.X;
+      scoreO.textContent = scores.O;
+    }
+
+    function getStatus() {
+      if (gameMode === 'ai' && currentPlayer === 'O') return 'AI 思考中...';
+      return `${currentPlayer} 的回合`;
+    }
+
+    function updateStatus(msg = null) {
+      statusEl.textContent = msg || getStatus();
+    }
+
+    function checkWin() {
+      for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+          return { winner: gameState[a], pattern };
+        }
+      }
+      if (!gameState.includes('')) return { winner: 'draw' };
+      return null;
+    }
+
+    function handleWin(result) {
+      gameActive = false;
+      if (result.winner === 'draw') {
+        updateStatus('平局！');
+      } else {
+        cells.forEach((cell, i) => {
+          if (result.pattern.includes(i)) {
+            cell.classList.add('winning');
+          }
+        });
+        updateStatus(`${result.winner} 获胜！`);
+        scores[result.winner]++;
+        saveScores();
+        updateScoreDisplay();
+      }
+    }
+
+    function aiMove() {
+      const empty = gameState.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+
+      // Check if can win
+      for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        const vals = [gameState[a], gameState[b], gameState[c]];
+        if (vals.filter(v => v === 'O').length === 2 && vals.includes('')) {
+          const idx = [a, b, c][vals.indexOf('')];
+          return idx;
+        }
+      }
+
+      // Block X
+      for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        const vals = [gameState[a], gameState[b], gameState[c]];
+        if (vals.filter(v => v === 'X').length === 2 && vals.includes('')) {
+          const idx = [a, b, c][vals.indexOf('')];
+          return idx;
+        }
+      }
+
+      // Take center if available
+      if (gameState[4] === '') return 4;
+
+      // Random
+      return empty[Math.floor(Math.random() * empty.length)];
+    }
+
+    function handleCellClick(e) {
+      const idx = parseInt(e.target.dataset.index);
+
+      if (gameState[idx] || !gameActive) return;
+      if (gameMode === 'ai' && currentPlayer === 'O') return;
+
+      makeMove(idx);
+
+      if (gameActive && gameMode === 'ai') {
+        updateStatus();
+        setTimeout(() => {
+          if (!gameActive) return;
+          const aiIdx = aiMove();
+          makeMove(aiIdx);
+        }, 500);
+      }
+    }
+
+    function makeMove(idx) {
+      gameState[idx] = currentPlayer;
+      const cell = cells[idx];
+      cell.textContent = currentPlayer;
+      cell.classList.add(currentPlayer.toLowerCase());
+
+      const result = checkWin();
+      if (result) {
+        handleWin(result);
+      } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        updateStatus();
+      }
+    }
+
+    function restartGame() {
+      gameState = ['', '', '', '', '', '', '', '', ''];
+      currentPlayer = 'X';
+      gameActive = true;
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.className = 'cell';
+      });
+      updateStatus();
+    }
+
+    function setMode(mode) {
+      gameMode = mode;
+      modeBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+      });
+      restartGame();
+    }
+
+    // Event listeners
+    cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+    restartBtn.addEventListener('click', restartGame);
+    modeBtns.forEach(btn => btn.addEventListener('click', () => setMode(btn.dataset.mode)));
+
+    // Initialize
+    loadScores();
+    updateStatus();
+  </script>
+</body>
+</html>
