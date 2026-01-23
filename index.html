@@ -65,7 +65,7 @@
       overflow-x: hidden;
     }
 
-    /* 背景纹理 */
+    /* 背景纹理 - 更丰富的金色氛围 */
     body::before {
       content: '';
       position: fixed;
@@ -74,11 +74,40 @@
       right: 0;
       bottom: 0;
       background:
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(196, 165, 116, 0.03), transparent),
-        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(196, 165, 116, 0.02), transparent),
-        radial-gradient(ellipse 60% 40% at 20% 80%, rgba(196, 165, 116, 0.02), transparent);
+        /* 主光晕 - 顶部居中 */
+        radial-gradient(ellipse 120% 80% at 50% -30%, rgba(196, 165, 116, 0.12) 0%, rgba(196, 165, 116, 0.05) 40%, transparent 70%),
+        /* 右侧光晕 */
+        radial-gradient(ellipse 80% 60% at 85% 50%, rgba(196, 165, 116, 0.08) 0%, rgba(196, 165, 116, 0.03) 50%, transparent 80%),
+        /* 左侧光晕 */
+        radial-gradient(ellipse 70% 50% at 15% 60%, rgba(196, 165, 116, 0.06) 0%, rgba(196, 165, 116, 0.02) 50%, transparent 70%),
+        /* 底部补光 */
+        radial-gradient(ellipse 100% 40% at 50% 100%, rgba(196, 165, 116, 0.04) 0%, transparent 60%),
+        /* 整体微光 */
+        radial-gradient(ellipse 100% 100% at 50% 50%, rgba(196, 165, 116, 0.02) 0%, transparent 50%);
       pointer-events: none;
       z-index: -1;
+    }
+
+    /* 背景动画光点 */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(196, 165, 116, 0.15) 0%, transparent 25%),
+        radial-gradient(circle at 80% 70%, rgba(196, 165, 116, 0.12) 0%, transparent 20%),
+        radial-gradient(circle at 60% 20%, rgba(196, 165, 116, 0.08) 0%, transparent 15%);
+      pointer-events: none;
+      z-index: -1;
+      animation: bgShift 15s ease-in-out infinite;
+    }
+
+    @keyframes bgShift {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
     }
 
     .container {
