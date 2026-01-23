@@ -90,6 +90,24 @@ invoke Skill(superpowers:systematic-debugging)
 invoke Skill(skill-creator)
 ```
 
+### 6. 上传代码到 GitHub
+
+当用户说"上传到 github"、"提交代码"、"push"时：
+
+```
+git add .
+git commit -m "feat: description"
+git push origin main
+```
+
+**自动执行：**
+1. 检查 git status 和 diff
+2. 添加所有更改
+3. 提交（使用语义化前缀：feat/fix/docs/style/refactor/test/chore）
+4. 推送到 main 分支
+
+**快捷方式：** 直接说 `上传到 github` 或 `提交代码`
+
 ---
 
 ## 快捷命令速查
@@ -101,6 +119,7 @@ invoke Skill(skill-creator)
 代码审查 → requesting-code-review
 修复bug → systematic-debugging
 创建技能 → skill-creator
+上传github → git add + commit + push
 ```
 
 ---
