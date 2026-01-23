@@ -143,36 +143,32 @@
       animation-delay: -4s;
     }
 
-    .deco-circle:nth-child(4) {
-      width: 40px;
-      height: 40px;
-      bottom: 120px;
-      right: 20px;
-      opacity: 0.4;
-      animation-delay: -1s;
-    }
-
     @keyframes float {
       0%, 100% { transform: translateY(0) rotate(0deg); }
       50% { transform: translateY(-25px) rotate(8deg); }
     }
 
-    /* 光斑效果 */
+    /* 光斑效果 - 更浮夸 */
     .header-glow {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(196, 165, 116, 0.25) 0%, rgba(196, 165, 116, 0.1) 40%, transparent 70%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle,
+        rgba(196, 165, 116, 0.4) 0%,
+        rgba(196, 165, 116, 0.2) 30%,
+        rgba(196, 165, 116, 0.08) 60%,
+        transparent 80%);
       pointer-events: none;
-      animation: glowPulse 4s ease-in-out infinite;
+      animation: glowPulse 3s ease-in-out infinite;
+      filter: blur(20px);
     }
 
     @keyframes glowPulse {
-      0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
-      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+      0%, 100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
     }
 
     h1 {
@@ -599,7 +595,6 @@
   <div class="container">
     <header>
       <div class="header-decoration">
-        <div class="deco-circle"></div>
         <div class="deco-circle"></div>
         <div class="deco-circle"></div>
         <div class="deco-circle"></div>
