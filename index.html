@@ -84,7 +84,7 @@
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 80px 40px 120px;
+      padding: 60px 40px 100px;
     }
 
     /* Header */
@@ -92,41 +92,146 @@
       text-align: center;
       margin-bottom: 80px;
       position: relative;
+      padding: 60px 0;
     }
 
-    header::before {
-      content: '';
+    /* 装饰性背景元素 */
+    .header-decoration {
       position: absolute;
-      top: -20px;
+      top: 0;
       left: 50%;
       transform: translateX(-50%);
+      width: 300px;
+      height: 300px;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    .deco-circle {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .deco-circle:nth-child(1) {
+      width: 200px;
+      height: 200px;
+      top: -60px;
+      left: -100px;
+      opacity: 0.1;
+    }
+
+    .deco-circle:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      top: 20px;
+      right: -60px;
+      opacity: 0.15;
+      animation-delay: -2s;
+    }
+
+    .deco-circle:nth-child(3) {
       width: 60px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      height: 60px;
+      bottom: 40px;
+      left: 20px;
+      opacity: 0.2;
+      animation-delay: -4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    /* 光斑效果 */
+    .header-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(196, 165, 116, 0.15) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     h1 {
       font-family: var(--font-display);
-      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
       font-weight: 600;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 .highlight {
+      display: inline-block;
+      position: relative;
+    }
+
+    h1 .highlight::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+      opacity: 0.6;
+      z-index: -1;
+      transform: skewX(-5deg);
     }
 
     .subtitle {
       font-family: var(--font-display);
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--text-muted);
-      max-width: 500px;
+      max-width: 520px;
       margin: 0 auto;
       font-weight: 400;
       font-style: italic;
+      position: relative;
+      z-index: 1;
+      line-height: 1.8;
     }
+
+    /* 标签装饰 */
+    .header-tags {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-tag {
+      font-size: 0.75rem;
+      padding: 8px 18px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      transition: all 0.3s ease;
+    }
+
+    .header-tag:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .header-tag:nth-child(2) { animation-delay: 0.1s; }
+    .header-tag:nth-child(3) { animation-delay: 0.2s; }
+    .header-tag:nth-child(4) { animation-delay: 0.3s; }
 
     /* Search */
     .search-wrapper {
@@ -475,8 +580,19 @@
 <body>
   <div class="container">
     <header>
-      <h1>项目集合</h1>
+      <div class="header-decoration">
+        <div class="deco-circle"></div>
+        <div class="deco-circle"></div>
+        <div class="deco-circle"></div>
+      </div>
+      <div class="header-glow"></div>
+      <h1>项目<span class="highlight">集合</span></h1>
       <p class="subtitle">精选的工具与实验，点击即可体验</p>
+      <div class="header-tags">
+        <span class="header-tag">🎮 游戏</span>
+        <span class="header-tag">🔧 工具</span>
+        <span class="header-tag">⚡ 实验</span>
+      </div>
     </header>
 
     <div class="search-wrapper">
@@ -496,9 +612,9 @@
     </section>
 
     <footer>
-      <span>用心打造</span>
+      <span>Designed with care</span>
       <span>·</span>
-      <a href="projects.js">编辑 projects.js 添加新项目</a>
+      <span> kelivora.github.io</span>
     </footer>
   </div>
 
