@@ -153,11 +153,6 @@
       transform: translateX(-50%) translateY(50%) rotateX(180deg);
     }
 
-    /* When card-bottom flips, the backface shows - rotate number inside */
-    .card-bottom.backface .num {
-      transform: translateX(-50%) translateY(-50%) rotateX(180deg);
-    }
-
     /* Flipping animation - top card flips down like a real flip clock */
     .flip-card.flipping .card-top {
       transform: rotateX(-180deg);
@@ -454,14 +449,12 @@
           bottomCard.style.zIndex = 2;  // Bottom card comes to front
           topCard.style.zIndex = 1;     // Top card goes to back
           topCard.classList.add('backface');
-          bottomCard.classList.add('backface');
         }, 250);
 
         // After animation completes: reset for next flip
         setTimeout(function() {
           card.classList.remove('flipping');
           topCard.classList.remove('backface');
-          bottomCard.classList.remove('backface');
           // Reset z-index for normal state
           topCard.style.zIndex = 2;
           bottomCard.style.zIndex = 1;
