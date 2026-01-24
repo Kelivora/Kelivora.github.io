@@ -61,27 +61,15 @@
       flex-wrap: nowrap;
     }
 
-    /* Flip Card - Simple structure */
+    /* Flip Card */
     .flip-card {
       position: relative;
       width: 100px;
       height: 150px;
     }
 
-    /* Card background */
-    .flip-card-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      box-shadow: 0 4px 20px var(--card-shadow);
-    }
-
-    /* Upper flipper */
-    .flipper-upper {
+    /* Upper half - shows current number */
+    .card-top {
       position: absolute;
       top: 0;
       left: 0;
@@ -90,14 +78,14 @@
       background: var(--card-bg);
       border-radius: var(--border-radius) var(--border-radius) 0 0;
       box-shadow: 0 4px 20px var(--card-shadow);
+      overflow: hidden;
       transform-origin: bottom;
       transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
       z-index: 10;
-      overflow: hidden;
     }
 
-    /* Lower flipper */
-    .flipper-lower {
+    /* Lower half - shows next number */
+    .card-bottom {
       position: absolute;
       bottom: 0;
       left: 0;
@@ -106,23 +94,14 @@
       background: var(--card-bg);
       border-radius: 0 0 var(--border-radius) var(--border-radius);
       box-shadow: 0 4px 20px var(--card-shadow);
+      overflow: hidden;
       transform-origin: top;
       transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
       z-index: 5;
-      overflow: hidden;
-    }
-
-    /* Flipping states */
-    .flip-card.flipping .flipper-upper {
-      transform: rotateX(-180deg);
-    }
-
-    .flip-card.flipping .flipper-lower {
-      transform: rotateX(180deg);
     }
 
     /* Hindge line */
-    .flipper-upper::after {
+    .card-top::after {
       content: '';
       position: absolute;
       bottom: 0;
@@ -132,38 +111,40 @@
       background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
     }
 
-    /* Number - always on top, centered */
-    .flip-card .number {
+    /* Number styling */
+    .card-top .num {
       position: absolute;
-      top: 50%;
+      bottom: 0;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
       font-size: 88px;
       font-weight: 600;
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      z-index: 20;
-      pointer-events: none;
     }
 
-    /* Upper shows current number (clipped) */
-    .flipper-upper .number {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      clip-path: inset(0 0 50% 0);
-    }
-
-    /* Lower shows next number (clipped) */
-    .flipper-lower .number {
+    .card-bottom .num {
       position: absolute;
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      clip-path: inset(50% 0 0 0);
+      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+      font-size: 88px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+      letter-spacing: 2px;
+    }
+
+    /* Flipping animation - top flips down, bottom flips up */
+    .flip-card.flipping .card-top {
+      transform: rotateX(-180deg);
+    }
+
+    .flip-card.flipping .card-bottom {
+      transform: rotateX(180deg);
     }
 
     /* Divider */
@@ -274,19 +255,15 @@
         height: 85px;
       }
 
-      .flip-card-bg, .flipper-upper, .flipper-lower {
-        border-radius: 12px;
-      }
-
-      .flipper-upper {
+      .card-top, .card-bottom {
         border-radius: 12px 12px 0 0;
       }
 
-      .flipper-lower {
+      .card-bottom {
         border-radius: 0 0 12px 12px;
       }
 
-      .flip-card .number {
+      .card-top .num, .card-bottom .num {
         font-size: 48px;
       }
     }
@@ -298,19 +275,15 @@
         height: 80px;
       }
 
-      .flip-card-bg, .flipper-upper, .flipper-lower {
-        border-radius: 10px;
-      }
-
-      .flipper-upper {
+      .card-top, .card-bottom {
         border-radius: 10px 10px 0 0;
       }
 
-      .flipper-lower {
+      .card-bottom {
         border-radius: 0 0 10px 10px;
       }
 
-      .flip-card .number {
+      .card-top .num, .card-bottom .num {
         font-size: 42px;
       }
 
@@ -326,7 +299,7 @@
         height: 75px;
       }
 
-      .flip-card .number {
+      .card-top .num, .card-bottom .num {
         font-size: 38px;
       }
     }
@@ -338,7 +311,7 @@
         height: 200px;
       }
 
-      .flip-card .number {
+      .card-top .num, .card-bottom .num {
         font-size: 115px;
       }
     }
@@ -349,24 +322,12 @@
     <div class="clock-wrapper">
       <!-- Hours -->
       <div class="flip-card" data-unit="hours-tens">
-        <div class="flip-card-bg"></div>
-        <div class="flipper-upper">
-          <span class="number">0</span>
-        </div>
-        <div class="flipper-lower">
-          <span class="number">0</span>
-        </div>
-        <span class="number">0</span>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
       <div class="flip-card" data-unit="hours-units">
-        <div class="flip-card-bg"></div>
-        <div class="flipper-upper">
-          <span class="number">0</span>
-        </div>
-        <div class="flipper-lower">
-          <span class="number">0</span>
-        </div>
-        <span class="number">0</span>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
 
       <!-- Divider -->
@@ -377,24 +338,12 @@
 
       <!-- Minutes -->
       <div class="flip-card" data-unit="minutes-tens">
-        <div class="flip-card-bg"></div>
-        <div class="flipper-upper">
-          <span class="number">0</span>
-        </div>
-        <div class="flipper-lower">
-          <span class="number">0</span>
-        </div>
-        <span class="number">0</span>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
       <div class="flip-card" data-unit="minutes-units">
-        <div class="flip-card-bg"></div>
-        <div class="flipper-upper">
-          <span class="number">0</span>
-        </div>
-        <div class="flipper-lower">
-          <span class="number">0</span>
-        </div>
-        <span class="number">0</span>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
 
       <!-- Divider -->
@@ -405,24 +354,12 @@
 
       <!-- Seconds -->
       <div class="flip-card" data-unit="seconds-tens">
-        <div class="flip-card-bg"></div>
-        <div class="flipper-upper">
-          <span class="number">0</span>
-        </div>
-        <div class="flipper-lower">
-          <span class="number">0</span>
-        </div>
-        <span class="number">0</span>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
       <div class="flip-card" data-unit="seconds-units">
-        <div class="flip-card-bg"></div>
-        <div class="flipper-upper">
-          <span class="number">0</span>
-        </div>
-        <div class="flipper-lower">
-          <span class="number">0</span>
-        </div>
-        <span class="number">0</span>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
     </div>
 
@@ -467,48 +404,42 @@
       }
 
       function flipCard(unit, newValue, oldValue) {
-        const card = document.querySelector(`[data-unit="${unit}"]`);
+        const card = document.querySelector('[data-unit="' + unit + '"]');
         if (!card || isFlipping[unit]) return;
 
         isFlipping[unit] = true;
 
-        const mainNumber = card.querySelector(':scope > .number');
-        const upperNumber = card.querySelector('.flipper-upper .number');
-        const lowerNumber = card.querySelector('.flipper-lower .number');
+        var topNum = card.querySelector('.card-top .num');
+        var bottomNum = card.querySelector('.card-bottom .num');
 
-        // Before flip: main shows old, upper shows old, lower shows new
-        mainNumber.textContent = oldValue;
-        upperNumber.textContent = oldValue;
-        lowerNumber.textContent = newValue;
+        // Before flip: top shows old, bottom shows new
+        topNum.textContent = oldValue;
+        bottomNum.textContent = newValue;
 
-        // Start flip
+        // Start flip animation
         card.classList.add('flipping');
 
-        // After half animation: main shows new
-        setTimeout(() => {
-          mainNumber.textContent = newValue;
-        }, 250);
-
-        // After animation complete: reset
-        setTimeout(() => {
+        // After animation: reset - top shows new (bottom now hidden)
+        setTimeout(function() {
           card.classList.remove('flipping');
-          upperNumber.textContent = newValue;
+          topNum.textContent = newValue;
+          bottomNum.textContent = newValue;
           isFlipping[unit] = false;
         }, 500);
       }
 
       function updateDate() {
-        const dateEl = document.getElementById('date');
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth() + 1;
-        const day = now.getDate();
+        var dateEl = document.getElementById('date');
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        var day = now.getDate();
 
-        dateEl.innerHTML = `<span style="color: var(--text-primary)">${year}年${month}月${day}日</span> ${weekDays[now.getDay()]}`;
+        dateEl.innerHTML = '<span style="color: var(--text-primary)">' + year + '年' + month + '月' + day + '日</span> ' + weekDays[now.getDay()];
       }
 
       function updateClock() {
-        const time = getCurrentTime();
+        var time = getCurrentTime();
 
         if (showSeconds) {
           if (lastTime.secondsTens !== undefined && time.secondsTens !== lastTime.secondsTens) {
@@ -537,11 +468,11 @@
       }
 
       function init() {
-        const time = getCurrentTime();
+        var time = getCurrentTime();
 
-        document.querySelectorAll('.flip-card').forEach(card => {
-          const unit = card.dataset.unit;
-          let value;
+        document.querySelectorAll('.flip-card').forEach(function(card) {
+          var unit = card.dataset.unit;
+          var value;
           switch(unit) {
             case 'hours-tens': value = time.hoursTens; break;
             case 'hours-units': value = time.hoursUnits; break;
@@ -550,9 +481,8 @@
             case 'seconds-tens': value = time.secondsTens; break;
             case 'seconds-units': value = time.secondsUnits; break;
           }
-          card.querySelector(':scope > .number').textContent = value;
-          card.querySelector('.flipper-upper .number').textContent = value;
-          card.querySelector('.flipper-lower .number').textContent = value;
+          card.querySelector('.card-top .num').textContent = value;
+          card.querySelector('.card-bottom .num').textContent = value;
         });
 
         lastTime = time;
@@ -573,9 +503,9 @@
       document.getElementById('btn-sec').addEventListener('click', function() {
         showSeconds = !showSeconds;
         this.classList.toggle('active', showSeconds);
-        const secCards = document.querySelectorAll('[data-unit^="seconds"]');
-        const secDivider = document.querySelector('.seconds-divider');
-        secCards.forEach(card => card.classList.toggle('hidden', !showSeconds));
+        var secCards = document.querySelectorAll('[data-unit^="seconds"]');
+        var secDivider = document.querySelector('.seconds-divider');
+        secCards.forEach(function(card) { card.classList.toggle('hidden', !showSeconds); });
         secDivider.classList.toggle('hidden', !showSeconds);
       });
 
