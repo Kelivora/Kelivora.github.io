@@ -43,6 +43,13 @@ const projects = [
     icon: "❌⭕",
     desc: "经典井字棋游戏，支持双人或人机对战",
     tags: [{ text: "游戏", new: true }]
+  },
+  {
+    title: "翻页时钟",
+    url: "projects/tools/flip-clock.html",
+    icon: "⏱️",
+    desc: "优雅的翻页时钟动画，支持响应式布局和12/24小时切换",
+    tags: [{ text: "工具", new: true }]
   }
 ];
 

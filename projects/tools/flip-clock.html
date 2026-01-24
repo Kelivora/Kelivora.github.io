@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>翻页时钟</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #faf9f7;
+      --bg-secondary: #f5f3f0;
+      --bg-tertiary: #efeae5;
+      --text-primary: #1a1a18;
+      --text-secondary: #8a8a83;
+      --text-muted: #aca9a2;
+      --accent: #c4a574;
+      --accent-light: #e8dcc8;
+      --accent-dark: #a08050;
+      --card-bg: #ffffff;
+      --card-shadow: rgba(0, 0, 0, 0.06);
+      --border-radius: 16px;
+      --font-display: 'Noto Serif SC', Georgia, serif;
+      --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .clock-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .clock-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Flip Card Styles */
+    .flip-card {
+      position: relative;
+      width: 80px;
+      height: 120px;
+      perspective: 1000px;
+    }
+
+    .flip-card-lg {
+      width: 100px;
+      height: 150px;
+    }
+
+    .flip-card-sm {
+      width: 60px;
+      height: 90px;
+    }
+
+    .flipper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .flipper.flipping {
+      transform: rotateX(-180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 50%;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px var(--card-shadow);
+      backface-visibility: hidden;
+      overflow: hidden;
+    }
+
+    .card-face::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+    }
+
+    .card-face-top {
+      top: 0;
+      border-bottom: 1px solid var(--accent-light);
+      align-items: flex-end;
+      padding-bottom: 8px;
+      border-radius: var(--border-radius) var(--border-radius) 4px 4px;
+    }
+
+    .card-face-bottom {
+      top: 50%;
+      align-items: flex-start;
+      padding-top: 8px;
+      border-radius: 4px 4px var(--border-radius) var(--border-radius);
+    }
+
+    .card-face.flipping {
+      transform: rotateX(-180deg);
+    }
+
+    .number {
+      font-family: var(--font-display);
+      font-size: 56px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .flip-card-lg .number {
+      font-size: 72px;
+    }
+
+    .flip-card-sm .number {
+      font-size: 42px;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 0 8px;
+    }
+
+    .divider-dot {
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    .divider-dot:last-child {
+      animation-delay: 0.5s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* Date Display */
+    .date-display {
+      font-family: var(--font-body);
+      font-size: 18px;
+      color: var(--text-secondary);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Bottom info */
+    .info {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Mobile Portrait */
+    @media (max-width: 600px) and (orientation: portrait) {
+      .flip-card {
+        width: 60px;
+        height: 90px;
+      }
+
+      .flip-card-lg {
+        width: 75px;
+        height: 110px;
+      }
+
+      .flip-card .number {
+        font-size: 42px;
+      }
+
+      .flip-card-lg .number {
+        font-size: 56px;
+      }
+
+      .clock-wrapper {
+        gap: 8px;
+      }
+
+      .divider {
+        padding: 0 4px;
+      }
+
+      .divider-dot {
+        width: 10px;
+        height: 10px;
+      }
+
+      .date-display {
+        font-size: 14px;
+      }
+    }
+
+    /* Mobile Landscape */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .flip-card {
+        width: 55px;
+        height: 85px;
+      }
+
+      .flip-card-lg {
+        width: 70px;
+        height: 105px;
+      }
+
+      .flip-card .number {
+        font-size: 38px;
+      }
+
+      .flip-card-lg .number {
+        font-size: 50px;
+      }
+
+      .clock-wrapper {
+        gap: 6px;
+      }
+
+      .divider {
+        padding: 0 4px;
+      }
+
+      .divider-dot {
+        width: 8px;
+        height: 8px;
+      }
+
+      .date-display {
+        font-size: 13px;
+      }
+
+      .clock-container {
+        gap: 15px;
+      }
+
+      .info {
+        bottom: 10px;
+        font-size: 12px;
+      }
+    }
+
+    /* Small phones */
+    @media (max-width: 360px) {
+      .flip-card {
+        width: 50px;
+        height: 75px;
+      }
+
+      .flip-card-lg {
+        width: 60px;
+        height: 90px;
+      }
+
+      .flip-card .number {
+        font-size: 34px;
+      }
+
+      .flip-card-lg .number {
+        font-size: 42px;
+      }
+    }
+
+    /* Large screens */
+    @media (min-width: 1200px) {
+      .flip-card-lg {
+        width: 120px;
+        height: 180px;
+      }
+
+      .flip-card-lg .number {
+        font-size: 88px;
+      }
+    }
+
+    /* Hindrance lines on flip cards */
+    .card-face::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .card-face-bottom::after {
+      bottom: auto;
+      top: 0;
+    }
+
+    /* Active flip effect */
+    .flipper.flipping .card-face-top {
+      z-index: 1;
+    }
+
+    .flipper.flipping .card-face-bottom {
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock-container">
+    <div class="clock-wrapper">
+      <!-- Hours -->
+      <div class="flip-card flip-card-lg" data-unit="hours-tens">
+        <div class="flipper">
+          <div class="card-face card-face-top">
+            <span class="number">0</span>
+          </div>
+          <div class="card-face card-face-bottom">
+            <span class="number">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="flip-card flip-card-lg" data-unit="hours-units">
+        <div class="flipper">
+          <div class="card-face card-face-top">
+            <span class="number">0</span>
+          </div>
+          <div class="card-face card-face-bottom">
+            <span class="number">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider">
+        <div class="divider-dot"></div>
+        <div class="divider-dot"></div>
+      </div>
+
+      <!-- Minutes -->
+      <div class="flip-card flip-card-lg" data-unit="minutes-tens">
+        <div class="flipper">
+          <div class="card-face card-face-top">
+            <span class="number">0</span>
+          </div>
+          <div class="card-face card-face-bottom">
+            <span class="number">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="flip-card flip-card-lg" data-unit="minutes-units">
+        <div class="flipper">
+          <div class="card-face card-face-top">
+            <span class="number">0</span>
+          </div>
+          <div class="card-face card-face-bottom">
+            <span class="number">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider">
+        <div class="divider-dot"></div>
+        <div class="divider-dot"></div>
+      </div>
+
+      <!-- Seconds -->
+      <div class="flip-card" data-unit="seconds-tens">
+        <div class="flipper">
+          <div class="card-face card-face-top">
+            <span class="number">0</span>
+          </div>
+          <div class="card-face card-face-bottom">
+            <span class="number">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="flip-card" data-unit="seconds-units">
+        <div class="flipper">
+          <div class="card-face card-face-top">
+            <span class="number">0</span>
+          </div>
+          <div class="card-face card-face-bottom">
+            <span class="number">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="date-display" id="date"></div>
+  </div>
+
+  <div class="info">双击屏幕切换12/24小时制</div>
+
+  <script>
+    (function() {
+      const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      const weekDaysEn = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+      let use12Hour = false;
+      let lastTime = {};
+
+      function getCurrentTime() {
+        const now = new Date();
+        let hours = now.getHours();
+
+        if (use12Hour) {
+          hours = hours % 12;
+          if (hours === 0) hours = 12;
+        }
+
+        return {
+          hoursTens: Math.floor(hours / 10),
+          hoursUnits: hours % 10,
+          minutesTens: Math.floor(now.getMinutes() / 10),
+          minutesUnits: now.getMinutes() % 10,
+          secondsTens: Math.floor(now.getSeconds() / 10),
+          secondsUnits: now.getSeconds() % 10,
+          day: now.getDate(),
+          month: now.getMonth() + 1,
+          weekDay: weekDays[now.getDay()],
+          weekDayEn: weekDaysEn[now.getDay()]
+        };
+      }
+
+      function updateCard(unit, newValue, oldValue) {
+        const card = document.querySelector(`[data-unit="${unit}"]`);
+        if (!card) return;
+
+        const flipper = card.querySelector('.flipper');
+        const topFace = card.querySelector('.card-face-top');
+        const bottomFace = card.querySelector('.card-face-bottom');
+
+        // Set the old value on both faces before flip
+        topFace.querySelector('.number').textContent = oldValue;
+        bottomFace.querySelector('.number').textContent = oldValue;
+
+        // Start flip animation
+        flipper.classList.add('flipping');
+
+        // After half the animation, update the bottom face to new value
+        setTimeout(() => {
+          bottomFace.querySelector('.number').textContent = newValue;
+        }, 300);
+
+        // Reset after animation completes
+        setTimeout(() => {
+          flipper.classList.remove('flipping');
+          topFace.querySelector('.number').textContent = newValue;
+        }, 600);
+      }
+
+      function updateDate() {
+        const time = getCurrentTime();
+        const dateEl = document.getElementById('date');
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+        const weekday = now.getDay();
+        const year = now.getFullYear();
+
+        dateEl.innerHTML = `<span style="color: var(--text-primary)">${year}年${month}月${day}日</span> ${weekDays[weekday]}`;
+      }
+
+      function updateClock() {
+        const time = getCurrentTime();
+
+        // Update seconds (always flip)
+        if (lastTime.secondsTens !== undefined && time.secondsTens !== lastTime.secondsTens) {
+          updateCard('seconds-tens', time.secondsTens, lastTime.secondsTens);
+        }
+        if (lastTime.secondsUnits !== undefined && time.secondsUnits !== lastTime.secondsUnits) {
+          updateCard('seconds-units', time.secondsUnits, lastTime.secondsUnits);
+        }
+
+        // Update minutes
+        if (lastTime.minutesTens !== undefined && time.minutesTens !== lastTime.minutesTens) {
+          updateCard('minutes-tens', time.minutesTens, lastTime.minutesTens);
+        }
+        if (lastTime.minutesUnits !== undefined && time.minutesUnits !== lastTime.minutesUnits) {
+          updateCard('minutes-units', time.minutesUnits, lastTime.minutesUnits);
+        }
+
+        // Update hours
+        if (lastTime.hoursTens !== undefined && time.hoursTens !== lastTime.hoursTens) {
+          updateCard('hours-tens', time.hoursTens, lastTime.hoursTens);
+        }
+        if (lastTime.hoursUnits !== undefined && time.hoursUnits !== lastTime.hoursUnits) {
+          updateCard('hours-units', time.hoursUnits, lastTime.hoursUnits);
+        }
+
+        lastTime = time;
+      }
+
+      // Initialize
+      function init() {
+        const time = getCurrentTime();
+
+        // Set initial values without animation
+        document.querySelector('[data-unit="hours-tens"] .card-face-top .number').textContent = time.hoursTens;
+        document.querySelector('[data-unit="hours-tens"] .card-face-bottom .number').textContent = time.hoursTens;
+        document.querySelector('[data-unit="hours-units"] .card-face-top .number').textContent = time.hoursUnits;
+        document.querySelector('[data-unit="hours-units"] .card-face-bottom .number').textContent = time.hoursUnits;
+        document.querySelector('[data-unit="minutes-tens"] .card-face-top .number').textContent = time.minutesTens;
+        document.querySelector('[data-unit="minutes-tens"] .card-face-bottom .number').textContent = time.minutesTens;
+        document.querySelector('[data-unit="minutes-units"] .card-face-top .number').textContent = time.minutesUnits;
+        document.querySelector('[data-unit="minutes-units"] .card-face-bottom .number').textContent = time.minutesUnits;
+        document.querySelector('[data-unit="seconds-tens"] .card-face-top .number').textContent = time.secondsTens;
+        document.querySelector('[data-unit="seconds-tens"] .card-face-bottom .number').textContent = time.secondsTens;
+        document.querySelector('[data-unit="seconds-units"] .card-face-top .number').textContent = time.secondsUnits;
+        document.querySelector('[data-unit="seconds-units"] .card-face-bottom .number').textContent = time.secondsUnits;
+
+        lastTime = time;
+        updateDate();
+
+        // Start the clock
+        setInterval(updateClock, 1000);
+        setInterval(updateDate, 60000);
+      }
+
+      // Toggle 12/24 hour format on double tap/click
+      document.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+        use12Hour = !use12Hour;
+        lastTime = {};
+        updateClock();
+        updateDate();
+      });
+
+      // Prevent zoom on mobile
+      document.addEventListener('touchend', function(e) {
+        if (e.target.closest('.info')) {
+          use12Hour = !use12Hour;
+          lastTime = {};
+          updateClock();
+          updateDate();
+        }
+      }, { passive: true });
+
+      init();
+    })();
+  </script>
+</body>
+</html>

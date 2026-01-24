@@ -5,6 +5,7 @@ description: |
   - Build/optimize frontend UI (pages, components, tools)
   - Plan and implement multi-step features
   - Start dev server / deploy to port 2527
+  - Deploy to GitHub Pages
   - Review code / fix bugs
   - Create new skills or features
 
@@ -22,6 +23,7 @@ description: |
 | 启动开发服务器 | `启动服务器` / `部署到2527` |
 | 代码审查/修复bug | `审查代码` / `修复bug` |
 | 创建新技能 | `创建技能 xxx` |
+| 部署到 GitHub Pages | `部署到 GH Pages` / `发布到线上` |
 
 ---
 
@@ -108,6 +110,31 @@ git push origin main
 
 **快捷方式：** 直接说 `上传到 github` 或 `提交代码`
 
+### 7. 部署到 GitHub Pages
+
+当用户说"部署到 github pages"、"发布到线上"、"gh-pages"时：
+
+```bash
+# 方法1: 使用 gh-pages 包
+npx gh-pages -d .
+
+# 方法2: 手动推送 gh-pages 分支
+git checkout gh-pages
+git merge main --no-edit
+git push origin gh-pages
+git checkout main
+```
+
+**自动执行：**
+1. 确保代码已提交到 main 分支
+2. 同步更新 gh-pages 分支
+3. 推送到远程触发 Pages 部署
+4. 返回部署后的访问地址
+
+**快捷方式：** 直接说 `部署到 GH Pages` 或 `发布到线上`
+
+**触发词：** "github pages"、"gh-pages"、"部署"、"发布"、"线上"、"deploy"
+
 ---
 
 ## 快捷命令速查
@@ -120,6 +147,7 @@ git push origin main
 修复bug → systematic-debugging
 创建技能 → skill-creator
 上传github → git add + commit + push
+部署GH Pages → npx gh-pages -d .
 ```
 
 ---
