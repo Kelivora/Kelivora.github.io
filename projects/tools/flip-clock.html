@@ -123,13 +123,13 @@
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* Show only top half of the number */
-      clip-path: inset(0 0 50% 0);
+      /* Show only top half of the number - positioned at bottom so top half shows */
+      clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
     }
 
     .card-bottom .num {
       position: absolute;
-      top: 0;
+      bottom: 0;
       left: 50%;
       transform: translateX(-50%);
       font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
@@ -138,8 +138,8 @@
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* Show only bottom half of the number */
-      clip-path: inset(50% 0 0 0);
+      /* Show only bottom half of the number - positioned at bottom so bottom half shows */
+      clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
     }
 
     /* When card-top flips, the backface shows - we need to rotate the number inside */
