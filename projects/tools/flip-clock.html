@@ -19,7 +19,7 @@
       --accent-light: #e8dcc8;
       --accent-dark: #a08050;
       --card-bg: #ffffff;
-      --card-shadow: rgba(0, 0, 0, 0.06);
+      --card-shadow: rgba(0, 0, 0, 0.08);
       --border-radius: 20px;
       --font-display: 'Noto Serif SC', Georgia, serif;
       --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -61,52 +61,118 @@
       flex-wrap: nowrap;
     }
 
-    /* Flip Card Styles */
+    /* Flip Card Styles - True Split Flip */
     .flip-card {
       position: relative;
-      width: 110px;
-      height: 170px;
+      width: 100px;
+      height: 150px;
       perspective: 1000px;
     }
 
-    .flip-card-lg {
-      width: 110px;
-      height: 170px;
-    }
-
-    .flip-card-sm {
-      width: 80px;
-      height: 125px;
-    }
-
-    .flipper {
+    .flipper-container {
       position: relative;
       width: 100%;
       height: 100%;
-      transform-style: preserve-3d;
-      transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
     }
 
-    .flipper.flipping {
-      transform: rotateX(-180deg);
-    }
-
-    .card-face {
+    /* Upper half - shows bottom of current number */
+    .card-upper {
       position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 50%;
-      left: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       background: var(--card-bg);
-      border-radius: var(--border-radius);
+      border-radius: var(--border-radius) var(--border-radius) 0 0;
       box-shadow: 0 4px 20px var(--card-shadow);
-      backface-visibility: hidden;
       overflow: hidden;
+      transform-origin: bottom;
+      z-index: 2;
     }
 
-    .card-face::before {
+    /* Lower half - shows top of next number */
+    .card-lower {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: var(--card-bg);
+      border-radius: 0 0 var(--border-radius) var(--border-radius);
+      box-shadow: 0 4px 20px var(--card-shadow);
+      overflow: hidden;
+      transform-origin: top;
+      z-index: 1;
+    }
+
+    /* Upper flipper - animates down */
+    .upper-flipper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 200%;
+      transform-origin: bottom center;
+      transform: rotateX(0deg);
+    }
+
+    .upper-flipper.flipping {
+      animation: flipDown 0.5s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+    }
+
+    @keyframes flipDown {
+      0% { transform: rotateX(0deg); }
+      100% { transform: rotateX(-180deg); }
+    }
+
+    /* Lower flipper - animates up */
+    .lower-flipper {
+      position: absolute;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 200%;
+      transform-origin: top center;
+      transform: rotateX(0deg);
+    }
+
+    .lower-flipper.flipping {
+      animation: flipUp 0.5s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+    }
+
+    @keyframes flipUp {
+      0% { transform: rotateX(0deg); }
+      100% { transform: rotateX(180deg); }
+    }
+
+    /* Number styling */
+    .number {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+      font-size: 88px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+      letter-spacing: 2px;
+    }
+
+    /* Upper shows bottom half of current number */
+    .card-upper .number {
+      bottom: 0;
+      clip-path: inset(0 0 50% 0);
+    }
+
+    /* Lower shows top half of next number */
+    .card-lower .number {
+      top: 0;
+      clip-path: inset(50% 0 0 0);
+    }
+
+    /* Hindge line */
+    .card-upper::after,
+    .card-lower::before {
       content: '';
       position: absolute;
       left: 0;
@@ -115,41 +181,8 @@
       background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
     }
 
-    .card-face-top {
-      top: 0;
-      border-bottom: 1px solid var(--accent-light);
-      align-items: flex-end;
-      padding-bottom: 8px;
-      border-radius: var(--border-radius) var(--border-radius) 4px 4px;
-    }
-
-    .card-face-bottom {
-      top: 50%;
-      align-items: flex-start;
-      padding-top: 8px;
-      border-radius: 4px 4px var(--border-radius) var(--border-radius);
-    }
-
-    .card-face.flipping {
-      transform: rotateX(-180deg);
-    }
-
-    .number {
-      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
-      font-size: 72px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1;
-      letter-spacing: 2px;
-    }
-
-    .flip-card-lg .number {
-      font-size: 72px;
-    }
-
-    .flip-card-sm .number {
-      font-size: 52px;
-    }
+    .card-upper::after { bottom: 0; }
+    .card-lower::before { top: 0; }
 
     /* Divider */
     .divider {
@@ -205,34 +238,16 @@
         height: 85px;
       }
 
-      .flip-card-lg {
-        width: 55px;
-        height: 85px;
+      .card-upper, .card-lower {
+        border-radius: 12px 12px 0 0;
       }
 
-      .flip-card .number {
-        font-size: 44px;
+      .card-lower {
+        border-radius: 0 0 12px 12px;
       }
 
-      .flip-card-lg .number {
-        font-size: 44px;
-      }
-
-      .clock-wrapper {
-        gap: 6px;
-      }
-
-      .divider {
-        padding: 0 4px;
-      }
-
-      .divider-dot {
-        width: 8px;
-        height: 8px;
-      }
-
-      .date-display {
-        font-size: 14px;
+      .number {
+        font-size: 48px;
       }
     }
 
@@ -243,17 +258,16 @@
         height: 80px;
       }
 
-      .flip-card-lg {
-        width: 50px;
-        height: 80px;
+      .card-upper, .card-lower {
+        border-radius: 10px 10px 0 0;
       }
 
-      .flip-card .number {
-        font-size: 40px;
+      .card-lower {
+        border-radius: 0 0 10px 10px;
       }
 
-      .flip-card-lg .number {
-        font-size: 40px;
+      .number {
+        font-size: 42px;
       }
 
       .clock-wrapper {
@@ -268,19 +282,6 @@
         width: 8px;
         height: 8px;
       }
-
-      .date-display {
-        font-size: 12px;
-      }
-
-      .clock-container {
-        gap: 10px;
-      }
-
-      .info {
-        bottom: 8px;
-        font-size: 11px;
-      }
     }
 
     /* Small phones */
@@ -290,25 +291,12 @@
         height: 75px;
       }
 
-      .flip-card-lg {
-        width: 48px;
-        height: 75px;
-      }
-
-      .flip-card .number {
-        font-size: 38px;
-      }
-
-      .flip-card-lg .number {
+      .number {
         font-size: 38px;
       }
 
       .clock-wrapper {
         gap: 4px;
-      }
-
-      .divider {
-        padding: 0 2px;
       }
 
       .divider-dot {
@@ -319,38 +307,14 @@
 
     /* Large screens */
     @media (min-width: 1200px) {
-      .flip-card, .flip-card-lg {
+      .flip-card {
         width: 130px;
         height: 200px;
       }
 
-      .flip-card .number, .flip-card-lg .number {
-        font-size: 92px;
+      .number {
+        font-size: 115px;
       }
-    }
-
-    /* Hindrance lines on flip cards */
-    .card-face::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: rgba(0, 0, 0, 0.05);
-    }
-
-    .card-face-bottom::after {
-      bottom: auto;
-      top: 0;
-    }
-
-    /* Active flip effect */
-    .flipper.flipping .card-face-top {
-      z-index: 1;
-    }
-
-    .flipper.flipping .card-face-bottom {
-      z-index: 0;
     }
   </style>
 </head>
@@ -358,23 +322,31 @@
   <div class="clock-container">
     <div class="clock-wrapper">
       <!-- Hours -->
-      <div class="flip-card flip-card-lg" data-unit="hours-tens">
-        <div class="flipper">
-          <div class="card-face card-face-top">
-            <span class="number">0</span>
+      <div class="flip-card" data-unit="hours-tens">
+        <div class="flipper-container">
+          <div class="card-upper">
+            <div class="upper-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
-          <div class="card-face card-face-bottom">
-            <span class="number">0</span>
+          <div class="card-lower">
+            <div class="lower-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
         </div>
       </div>
-      <div class="flip-card flip-card-lg" data-unit="hours-units">
-        <div class="flipper">
-          <div class="card-face card-face-top">
-            <span class="number">0</span>
+      <div class="flip-card" data-unit="hours-units">
+        <div class="flipper-container">
+          <div class="card-upper">
+            <div class="upper-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
-          <div class="card-face card-face-bottom">
-            <span class="number">0</span>
+          <div class="card-lower">
+            <div class="lower-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
         </div>
       </div>
@@ -386,23 +358,31 @@
       </div>
 
       <!-- Minutes -->
-      <div class="flip-card flip-card-lg" data-unit="minutes-tens">
-        <div class="flipper">
-          <div class="card-face card-face-top">
-            <span class="number">0</span>
+      <div class="flip-card" data-unit="minutes-tens">
+        <div class="flipper-container">
+          <div class="card-upper">
+            <div class="upper-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
-          <div class="card-face card-face-bottom">
-            <span class="number">0</span>
+          <div class="card-lower">
+            <div class="lower-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
         </div>
       </div>
-      <div class="flip-card flip-card-lg" data-unit="minutes-units">
-        <div class="flipper">
-          <div class="card-face card-face-top">
-            <span class="number">0</span>
+      <div class="flip-card" data-unit="minutes-units">
+        <div class="flipper-container">
+          <div class="card-upper">
+            <div class="upper-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
-          <div class="card-face card-face-bottom">
-            <span class="number">0</span>
+          <div class="card-lower">
+            <div class="lower-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
         </div>
       </div>
@@ -415,22 +395,30 @@
 
       <!-- Seconds -->
       <div class="flip-card" data-unit="seconds-tens">
-        <div class="flipper">
-          <div class="card-face card-face-top">
-            <span class="number">0</span>
+        <div class="flipper-container">
+          <div class="card-upper">
+            <div class="upper-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
-          <div class="card-face card-face-bottom">
-            <span class="number">0</span>
+          <div class="card-lower">
+            <div class="lower-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
         </div>
       </div>
       <div class="flip-card" data-unit="seconds-units">
-        <div class="flipper">
-          <div class="card-face card-face-top">
-            <span class="number">0</span>
+        <div class="flipper-container">
+          <div class="card-upper">
+            <div class="upper-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
-          <div class="card-face card-face-bottom">
-            <span class="number">0</span>
+          <div class="card-lower">
+            <div class="lower-flipper">
+              <span class="number">0</span>
+            </div>
           </div>
         </div>
       </div>
@@ -444,10 +432,10 @@
   <script>
     (function() {
       const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-      const weekDaysEn = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
       let use12Hour = false;
       let lastTime = {};
+      let isFlipping = {};
 
       function getCurrentTime() {
         const now = new Date();
@@ -464,100 +452,98 @@
           minutesTens: Math.floor(now.getMinutes() / 10),
           minutesUnits: now.getMinutes() % 10,
           secondsTens: Math.floor(now.getSeconds() / 10),
-          secondsUnits: now.getSeconds() % 10,
-          day: now.getDate(),
-          month: now.getMonth() + 1,
-          weekDay: weekDays[now.getDay()],
-          weekDayEn: weekDaysEn[now.getDay()]
+          secondsUnits: now.getSeconds() % 10
         };
       }
 
-      function updateCard(unit, newValue, oldValue) {
+      function flipCard(unit, newValue, oldValue) {
         const card = document.querySelector(`[data-unit="${unit}"]`);
-        if (!card) return;
+        if (!card || isFlipping[unit]) return;
 
-        const flipper = card.querySelector('.flipper');
-        const topFace = card.querySelector('.card-face-top');
-        const bottomFace = card.querySelector('.card-face-bottom');
+        isFlipping[unit] = true;
 
-        // Set the old value on both faces before flip
-        topFace.querySelector('.number').textContent = oldValue;
-        bottomFace.querySelector('.number').textContent = oldValue;
+        const upperFlipper = card.querySelector('.upper-flipper');
+        const lowerFlipper = card.querySelector('.lower-flipper');
 
-        // Start flip animation
-        flipper.classList.add('flipping');
+        // Set numbers - upper shows old value, lower shows new value
+        upperFlipper.querySelector('.number').textContent = oldValue;
+        lowerFlipper.querySelector('.number').textContent = newValue;
 
-        // After half the animation, update the bottom face to new value
+        // Start both animations simultaneously
+        upperFlipper.classList.add('flipping');
+        lowerFlipper.classList.add('flipping');
+
+        // Reset after animation
         setTimeout(() => {
-          bottomFace.querySelector('.number').textContent = newValue;
-        }, 250);
+          upperFlipper.classList.remove('flipping');
+          lowerFlipper.classList.remove('flipping');
 
-        // Reset after animation completes
-        setTimeout(() => {
-          flipper.classList.remove('flipping');
-          topFace.querySelector('.number').textContent = newValue;
+          // Reset positions for next flip
+          upperFlipper.querySelector('.number').textContent = newValue;
+          lowerFlipper.querySelector('.number').textContent = newValue;
+
+          isFlipping[unit] = false;
         }, 500);
       }
 
       function updateDate() {
-        const time = getCurrentTime();
         const dateEl = document.getElementById('date');
         const now = new Date();
+        const year = now.getFullYear();
         const month = now.getMonth() + 1;
         const day = now.getDate();
-        const weekday = now.getDay();
-        const year = now.getFullYear();
 
-        dateEl.innerHTML = `<span style="color: var(--text-primary)">${year}年${month}月${day}日</span> ${weekDays[weekday]}`;
+        dateEl.innerHTML = `<span style="color: var(--text-primary)">${year}年${month}月${day}日</span> ${weekDays[now.getDay()]}`;
       }
 
       function updateClock() {
         const time = getCurrentTime();
 
-        // Update seconds (always flip)
+        // Update seconds
         if (lastTime.secondsTens !== undefined && time.secondsTens !== lastTime.secondsTens) {
-          updateCard('seconds-tens', time.secondsTens, lastTime.secondsTens);
+          flipCard('seconds-tens', time.secondsTens, lastTime.secondsTens);
         }
         if (lastTime.secondsUnits !== undefined && time.secondsUnits !== lastTime.secondsUnits) {
-          updateCard('seconds-units', time.secondsUnits, lastTime.secondsUnits);
+          flipCard('seconds-units', time.secondsUnits, lastTime.secondsUnits);
         }
 
         // Update minutes
         if (lastTime.minutesTens !== undefined && time.minutesTens !== lastTime.minutesTens) {
-          updateCard('minutes-tens', time.minutesTens, lastTime.minutesTens);
+          flipCard('minutes-tens', time.minutesTens, lastTime.minutesTens);
         }
         if (lastTime.minutesUnits !== undefined && time.minutesUnits !== lastTime.minutesUnits) {
-          updateCard('minutes-units', time.minutesUnits, lastTime.minutesUnits);
+          flipCard('minutes-units', time.minutesUnits, lastTime.minutesUnits);
         }
 
         // Update hours
         if (lastTime.hoursTens !== undefined && time.hoursTens !== lastTime.hoursTens) {
-          updateCard('hours-tens', time.hoursTens, lastTime.hoursTens);
+          flipCard('hours-tens', time.hoursTens, lastTime.hoursTens);
         }
         if (lastTime.hoursUnits !== undefined && time.hoursUnits !== lastTime.hoursUnits) {
-          updateCard('hours-units', time.hoursUnits, lastTime.hoursUnits);
+          flipCard('hours-units', time.hoursUnits, lastTime.hoursUnits);
         }
 
         lastTime = time;
       }
 
-      // Initialize
       function init() {
         const time = getCurrentTime();
 
-        // Set initial values without animation
-        document.querySelector('[data-unit="hours-tens"] .card-face-top .number').textContent = time.hoursTens;
-        document.querySelector('[data-unit="hours-tens"] .card-face-bottom .number').textContent = time.hoursTens;
-        document.querySelector('[data-unit="hours-units"] .card-face-top .number').textContent = time.hoursUnits;
-        document.querySelector('[data-unit="hours-units"] .card-face-bottom .number').textContent = time.hoursUnits;
-        document.querySelector('[data-unit="minutes-tens"] .card-face-top .number').textContent = time.minutesTens;
-        document.querySelector('[data-unit="minutes-tens"] .card-face-bottom .number').textContent = time.minutesTens;
-        document.querySelector('[data-unit="minutes-units"] .card-face-top .number').textContent = time.minutesUnits;
-        document.querySelector('[data-unit="minutes-units"] .card-face-bottom .number').textContent = time.minutesUnits;
-        document.querySelector('[data-unit="seconds-tens"] .card-face-top .number').textContent = time.secondsTens;
-        document.querySelector('[data-unit="seconds-tens"] .card-face-bottom .number').textContent = time.secondsTens;
-        document.querySelector('[data-unit="seconds-units"] .card-face-top .number').textContent = time.secondsUnits;
-        document.querySelector('[data-unit="seconds-units"] .card-face-bottom .number').textContent = time.secondsUnits;
+        // Set initial values
+        document.querySelectorAll('.flip-card').forEach(card => {
+          const unit = card.dataset.unit;
+          let value;
+          switch(unit) {
+            case 'hours-tens': value = time.hoursTens; break;
+            case 'hours-units': value = time.hoursUnits; break;
+            case 'minutes-tens': value = time.minutesTens; break;
+            case 'minutes-units': value = time.minutesUnits; break;
+            case 'seconds-tens': value = time.secondsTens; break;
+            case 'seconds-units': value = time.secondsUnits; break;
+          }
+          card.querySelector('.upper-flipper .number').textContent = value;
+          card.querySelector('.lower-flipper .number').textContent = value;
+        });
 
         lastTime = time;
         updateDate();
@@ -567,7 +553,7 @@
         setInterval(updateDate, 60000);
       }
 
-      // Toggle 12/24 hour format on double tap/click
+      // Toggle 12/24 hour format
       document.addEventListener('dblclick', function(e) {
         e.preventDefault();
         use12Hour = !use12Hour;
@@ -576,7 +562,7 @@
         updateDate();
       });
 
-      // Prevent zoom on mobile
+      // Mobile tap on info
       document.addEventListener('touchend', function(e) {
         if (e.target.closest('.info')) {
           use12Hour = !use12Hour;
