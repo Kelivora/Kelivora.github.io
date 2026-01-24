@@ -68,10 +68,10 @@
       height: 150px;
     }
 
-    /* Upper half - shows current number */
+    /* Upper half - shows top half of current number */
     .card-top {
       position: absolute;
-      top: -1px;
+      top: 0;
       left: 0;
       width: 100%;
       height: 50%;
@@ -84,7 +84,7 @@
       z-index: 2;
     }
 
-    /* Lower half - shows next number */
+    /* Lower half - shows bottom half of next number */
     .card-bottom {
       position: absolute;
       top: 50%;
@@ -111,22 +111,8 @@
       background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
     }
 
-    /* Number styling - card-top shows bottom half, card-bottom shows top half */
+    /* Number styling - one number split into top and bottom halves */
     .card-top .num {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
-      font-size: 88px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1;
-      letter-spacing: 2px;
-      /* Full number, but card-top overflow:hidden shows only bottom half */
-    }
-
-    .card-bottom .num {
       position: absolute;
       bottom: 0;
       left: 50%;
@@ -137,7 +123,23 @@
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* Full number, but card-bottom overflow:hidden shows only top half */
+      /* Show only top half of the number */
+      clip-path: inset(0 0 50% 0);
+    }
+
+    .card-bottom .num {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+      font-size: 88px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+      letter-spacing: 2px;
+      /* Show only bottom half of the number */
+      clip-path: inset(50% 0 0 0);
     }
 
     /* When card-top flips, the backface shows - we need to rotate the number inside */
