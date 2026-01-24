@@ -111,22 +111,8 @@
       background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
     }
 
-    /* Number styling - card-top shows top half, card-bottom shows bottom half */
+    /* Number styling - card-top shows bottom half, card-bottom shows top half */
     .card-top .num {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
-      font-size: 88px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1;
-      letter-spacing: 2px;
-      /* Full number, but card-top overflow:hidden shows only top half */
-    }
-
-    .card-bottom .num {
       position: absolute;
       top: 0;
       left: 50%;
@@ -137,7 +123,21 @@
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* Full number, but card-bottom overflow:hidden shows only bottom half */
+      /* Full number, but card-top overflow:hidden shows only bottom half */
+    }
+
+    .card-bottom .num {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+      font-size: 88px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+      letter-spacing: 2px;
+      /* Full number, but card-bottom overflow:hidden shows only top half */
     }
 
     /* When card-top flips, the backface shows - we need to rotate the number inside */
