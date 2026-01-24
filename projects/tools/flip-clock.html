@@ -105,6 +105,7 @@
     /* 正面数字 - 上半部分可见 */
     .card-top::before {
       content: attr(data-num);
+      display: block;
       position: absolute;
       bottom: 0;
       left: 50%;
@@ -139,6 +140,7 @@
     /* 背面数字 - 下半部分可见 */
     .card-bottom::before {
       content: attr(data-num);
+      display: block;
       position: absolute;
       top: 0;
       left: 50%;
