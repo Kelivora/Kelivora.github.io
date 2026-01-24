@@ -111,7 +111,7 @@
       background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
     }
 
-    /* Number styling */
+    /* Number styling - card-top shows top half, card-bottom shows bottom half */
     .card-top .num {
       position: absolute;
       bottom: 0;
@@ -123,8 +123,7 @@
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* 让数字只显示上半部分 */
-      clip-path: inset(50% 0 0 0);
+      /* Full number, but card-top overflow:hidden shows only top half */
     }
 
     .card-bottom .num {
@@ -138,8 +137,12 @@
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* 让数字只显示下半部分 */
-      clip-path: inset(0 0 50% 0);
+      /* Full number, but card-bottom overflow:hidden shows only bottom half */
+    }
+
+    /* When card-top flips, the backface shows - we need to rotate the number inside */
+    .card-top.backface .num {
+      transform: translateX(-50%) rotateX(180deg);
     }
 
     /* Flipping animation - top card flips down like a real flip clock */
@@ -428,9 +431,12 @@
         // Start flip animation - only top card flips down
         card.classList.add('flipping');
 
-        // Halfway through animation, change bottom to new number
+        // Halfway through animation:
+        // - Change bottom to new number
+        // - Flip the number inside card-top so it appears correct when seen from back
         setTimeout(function() {
           bottomNum.textContent = newValue;
+          topCard.classList.add('backface');
         }, 250);
 
         // After animation: reset for next flip
@@ -438,6 +444,7 @@
           card.classList.remove('flipping');
           // Reset z-index
           topCard.style.zIndex = 2;
+          topCard.classList.remove('backface');
           // Both show new value for next flip cycle
           topNum.textContent = newValue;
           bottomNum.textContent = newValue;
