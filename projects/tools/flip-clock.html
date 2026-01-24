@@ -114,37 +114,37 @@
     /* Number styling - one number split into top and bottom halves */
     .card-top .num {
       position: absolute;
-      bottom: 0;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
       font-size: 88px;
       font-weight: 600;
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* Show only top half of the number - positioned at bottom so top half shows */
+      /* Show only top half of number, centered at middle line */
       clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
     }
 
     .card-bottom .num {
       position: absolute;
-      bottom: 0;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
       font-size: 88px;
       font-weight: 600;
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* Show only bottom half of the number - positioned at bottom so bottom half shows */
+      /* Show only bottom half of number, centered at middle line */
       clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
     }
 
     /* When card-top flips, the backface shows - we need to rotate the number inside */
     .card-top.backface .num {
-      transform: translateX(-50%) rotateX(180deg);
+      transform: translate(-50%, -50%) rotateX(180deg);
     }
 
     /* Flipping animation - top card flips down like a real flip clock */
