@@ -427,15 +427,32 @@
     <div class="date-display" id="date"></div>
   </div>
 
-  <div class="info">双击屏幕切换12/24小时制</div>
+  <div class="info">
+    <span id="toggle-12">双击屏幕切换12/24小时制</span> ·
+    <span id="toggle-sec" style="cursor: pointer;">隐藏秒数</span>
+  </div>
 
   <script>
     (function() {
       const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
       let use12Hour = false;
+      let showSeconds = true;
       let lastTime = {};
       let isFlipping = {};
+
+      function toggleSeconds() {
+        showSeconds = !showSeconds;
+        const secCards = document.querySelectorAll('[data-unit^="seconds"]');
+        const toggleSec = document.getElementById('toggle-sec');
+
+        secCards.forEach(card => {
+          card.style.visibility = showSeconds ? 'visible' : 'hidden';
+          card.style.opacity = showSeconds ? '1' : '0';
+        });
+
+        toggleSec.textContent = showSeconds ? '隐藏秒数' : '显示秒数';
+      }
 
       function getCurrentTime() {
         const now = new Date();
@@ -499,12 +516,14 @@
       function updateClock() {
         const time = getCurrentTime();
 
-        // Update seconds
-        if (lastTime.secondsTens !== undefined && time.secondsTens !== lastTime.secondsTens) {
-          flipCard('seconds-tens', time.secondsTens, lastTime.secondsTens);
-        }
-        if (lastTime.secondsUnits !== undefined && time.secondsUnits !== lastTime.secondsUnits) {
-          flipCard('seconds-units', time.secondsUnits, lastTime.secondsUnits);
+        // Update seconds only if enabled
+        if (showSeconds) {
+          if (lastTime.secondsTens !== undefined && time.secondsTens !== lastTime.secondsTens) {
+            flipCard('seconds-tens', time.secondsTens, lastTime.secondsTens);
+          }
+          if (lastTime.secondsUnits !== undefined && time.secondsUnits !== lastTime.secondsUnits) {
+            flipCard('seconds-units', time.secondsUnits, lastTime.secondsUnits);
+          }
         }
 
         // Update minutes
@@ -562,15 +581,18 @@
         updateDate();
       });
 
-      // Mobile tap on info
-      document.addEventListener('touchend', function(e) {
-        if (e.target.closest('.info')) {
-          use12Hour = !use12Hour;
-          lastTime = {};
-          updateClock();
-          updateDate();
-        }
-      }, { passive: true });
+      // Toggle seconds display
+      document.getElementById('toggle-sec').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSeconds();
+      });
+
+      document.getElementById('toggle-sec').addEventListener('touchend', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSeconds();
+      }, { passive: false });
 
       init();
     })();
