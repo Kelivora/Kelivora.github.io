@@ -59,6 +59,7 @@
       justify-content: center;
       gap: 12px;
       flex-wrap: nowrap;
+      perspective: 500px;
     }
 
     /* Flip Card */
@@ -66,6 +67,7 @@
       position: relative;
       width: 100px;
       height: 150px;
+      transform-style: preserve-3d;
     }
 
     /* Upper half - shows top half of current number */
@@ -80,6 +82,8 @@
       box-shadow: 0 4px 20px var(--card-shadow);
       overflow: hidden;
       transform-origin: bottom;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
       transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
       z-index: 2;
     }
@@ -96,15 +100,17 @@
       box-shadow: 0 4px 20px var(--card-shadow);
       overflow: hidden;
       transform-origin: top;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
       transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
       z-index: 1;
     }
 
-    /* Hindge line */
-    .card-top::after {
+    /* Hindge line - at top of bottom card */
+    .card-bottom::before {
       content: '';
       position: absolute;
-      bottom: 0;
+      top: 0;
       left: 0;
       right: 0;
       height: 1px;
@@ -116,33 +122,35 @@
       position: absolute;
       bottom: 0;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(50%);
       font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
       font-size: 88px;
       font-weight: 600;
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* Full number, card-top overflow:hidden shows only top half */
+      /* Num positioned at bottom of card, midpoint at 50% */
+      /* card-top overflow:hidden shows only top half of the number */
     }
 
     .card-bottom .num {
       position: absolute;
       top: 0;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(-50%);
       font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
       font-size: 88px;
       font-weight: 600;
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
-      /* Full number, card-bottom overflow:hidden shows only bottom half */
+      /* Num positioned at top of card, midpoint at 50% */
+      /* card-bottom overflow:hidden shows only bottom half of the number */
     }
 
     /* When card-top flips, the backface shows - rotate number inside */
     .card-top.backface .num {
-      transform: translateX(-50%) rotateX(180deg);
+      transform: translateX(-50%) translateY(50%) rotateX(180deg);
     }
 
     /* Flipping animation - top card flips down like a real flip clock */
@@ -418,6 +426,7 @@
         isFlipping[unit] = true;
 
         var topCard = card.querySelector('.card-top');
+        var bottomCard = card.querySelector('.card-bottom');
         var topNum = card.querySelector('.card-top .num');
         var bottomNum = card.querySelector('.card-bottom .num');
 
@@ -425,26 +434,30 @@
         topNum.textContent = oldValue;
         bottomNum.textContent = oldValue;
 
-        // Bring top card to front during flip
-        topCard.style.zIndex = 3;
+        // Ensure proper z-index for initial state
+        topCard.style.zIndex = 2;
+        bottomCard.style.zIndex = 1;
 
-        // Start flip animation - only top card flips down
+        // Start flip animation - top card flips down
         card.classList.add('flipping');
 
-        // Halfway through animation:
-        // - Change bottom to new number
-        // - Flip the number inside card-top so it appears correct when seen from back
+        // Halfway through animation (at 90 degrees rotation):
+        // - Bottom card becomes visible showing new number
+        // - Top card backface shows old number rotated 180 degrees
         setTimeout(function() {
           bottomNum.textContent = newValue;
+          bottomCard.style.zIndex = 2;  // Bottom card comes to front
+          topCard.style.zIndex = 1;     // Top card goes to back
           topCard.classList.add('backface');
         }, 250);
 
-        // After animation: reset for next flip
+        // After animation completes: reset for next flip
         setTimeout(function() {
           card.classList.remove('flipping');
-          // Reset z-index
-          topCard.style.zIndex = 2;
           topCard.classList.remove('backface');
+          // Reset z-index for normal state
+          topCard.style.zIndex = 2;
+          bottomCard.style.zIndex = 1;
           // Both show new value for next flip cycle
           topNum.textContent = newValue;
           bottomNum.textContent = newValue;
