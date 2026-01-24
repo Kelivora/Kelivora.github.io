@@ -87,7 +87,7 @@
       box-shadow: 0 4px 20px var(--card-shadow);
       overflow: hidden;
       transform-origin: bottom;
-      z-index: 2;
+      z-index: 10;
     }
 
     /* Lower half - shows top of next number */
@@ -102,7 +102,7 @@
       box-shadow: 0 4px 20px var(--card-shadow);
       overflow: hidden;
       transform-origin: top;
-      z-index: 1;
+      z-index: 5;
     }
 
     /* Upper flipper - animates down */
@@ -229,6 +229,36 @@
       font-size: 14px;
       color: var(--text-muted);
       text-align: center;
+    }
+
+    /* Control Buttons */
+    .controls {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .control-btn {
+      padding: 12px 24px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: var(--card-bg);
+      border: 1px solid var(--accent-light);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .control-btn:hover {
+      background: var(--accent-light);
+    }
+
+    .control-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
     }
 
     /* Mobile Portrait */
@@ -428,8 +458,12 @@
   </div>
 
   <div class="info">
-    <span id="toggle-12">双击屏幕切换12/24小时制</span> ·
-    <span id="toggle-sec" style="cursor: pointer;">隐藏秒数</span>
+    <span id="toggle-12">12/24小时制</span> ·
+    <span id="toggle-sec" style="cursor: pointer;">秒数</span>
+  </div>
+  <div class="controls">
+    <button id="btn-12" class="control-btn">12/24</button>
+    <button id="btn-sec" class="control-btn active">秒数</button>
   </div>
 
   <script>
@@ -440,19 +474,6 @@
       let showSeconds = true;
       let lastTime = {};
       let isFlipping = {};
-
-      function toggleSeconds() {
-        showSeconds = !showSeconds;
-        const secCards = document.querySelectorAll('[data-unit^="seconds"]');
-        const toggleSec = document.getElementById('toggle-sec');
-
-        secCards.forEach(card => {
-          card.style.visibility = showSeconds ? 'visible' : 'hidden';
-          card.style.opacity = showSeconds ? '1' : '0';
-        });
-
-        toggleSec.textContent = showSeconds ? '隐藏秒数' : '显示秒数';
-      }
 
       function getCurrentTime() {
         const now = new Date();
@@ -573,26 +594,24 @@
       }
 
       // Toggle 12/24 hour format
-      document.addEventListener('dblclick', function(e) {
-        e.preventDefault();
+      document.getElementById('btn-12').addEventListener('click', function() {
         use12Hour = !use12Hour;
+        this.classList.toggle('active', use12Hour);
         lastTime = {};
         updateClock();
         updateDate();
       });
 
       // Toggle seconds display
-      document.getElementById('toggle-sec').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleSeconds();
+      document.getElementById('btn-sec').addEventListener('click', function() {
+        showSeconds = !showSeconds;
+        this.classList.toggle('active', showSeconds);
+        const secCards = document.querySelectorAll('[data-unit^="seconds"]');
+        secCards.forEach(card => {
+          card.style.visibility = showSeconds ? 'visible' : 'hidden';
+          card.style.opacity = showSeconds ? '1' : '0';
+        });
       });
-
-      document.getElementById('toggle-sec').addEventListener('touchend', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleSeconds();
-      }, { passive: false });
 
       init();
     })();
