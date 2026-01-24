@@ -123,6 +123,8 @@
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
+      /* 让数字只显示上半部分 */
+      clip-path: inset(50% 0 0 0);
     }
 
     .card-bottom .num {
@@ -136,14 +138,16 @@
       color: var(--text-primary);
       line-height: 1;
       letter-spacing: 2px;
+      /* 让数字只显示下半部分 */
+      clip-path: inset(0 0 50% 0);
     }
 
-    /* Flipping animation - only top card flips down */
+    /* Flipping animation - top card flips down like a real flip clock */
     .flip-card.flipping .card-top {
       transform: rotateX(-180deg);
     }
 
-    /* Bottom card stays in place, just updates its number */
+    /* Bottom card is static */
     .flip-card.flipping .card-bottom {
       transform: rotateX(0);
     }
@@ -413,17 +417,17 @@
         var topNum = card.querySelector('.card-top .num');
         var bottomNum = card.querySelector('.card-bottom .num');
 
-        // Before flip: top shows old, bottom shows new
+        // Before flip: top shows old number (top half), bottom shows new number (bottom half)
         topNum.textContent = oldValue;
         bottomNum.textContent = newValue;
 
-        // Start flip animation - only top card flips
+        // Start flip animation - only top card flips down
         card.classList.add('flipping');
 
-        // After animation: top shows new (already rotated away), bottom shows new
+        // After animation: reset for next flip
         setTimeout(function() {
           card.classList.remove('flipping');
-          // Reset to show new value in both for next flip
+          // Both show new value for next flip cycle
           topNum.textContent = newValue;
           bottomNum.textContent = newValue;
           isFlipping[unit] = false;
