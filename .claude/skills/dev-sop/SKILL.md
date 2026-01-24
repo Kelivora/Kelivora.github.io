@@ -114,22 +114,44 @@ git push origin main
 
 当用户说"部署到 github pages"、"发布到线上"、"gh-pages"时：
 
-```bash
-# 方法1: 使用 gh-pages 包
-npx gh-pages -d .
+#### 完整部署流程
 
-# 方法2: 手动推送 gh-pages 分支
+```bash
+# 步骤1: 提交代码到 main 分支
+git add .
+git commit -m "feat: description"
+git push origin main
+
+# 步骤2: 同步并推送 gh-pages 分支
 git checkout gh-pages
 git merge main --no-edit
 git push origin gh-pages
 git checkout main
 ```
 
+#### 首次部署（无 gh-pages 分支）
+
+```bash
+# 如果 gh-pages 分支不存在
+git checkout -b gh-pages
+git push -u origin gh-pages
+git checkout main
+```
+
+#### 访问地址
+
+项目部署后访问地址格式：
+- 仓库 `username.github.io` → `https://username.github.io/`
+- 项目页面 `username.github.io/repo` → `https://username.github.io/repo/projects/xxx.html`
+
+本项目地址：`https://kelivora.github.io/projects/`
+
 **自动执行：**
-1. 确保代码已提交到 main 分支
-2. 同步更新 gh-pages 分支
-3. 推送到远程触发 Pages 部署
-4. 返回部署后的访问地址
+1. 检查 git status 和 diff
+2. 提交所有更改到 main 分支
+3. 同步更新 gh-pages 分支
+4. 推送到远程触发 Pages 部署
+5. 返回部署后的访问地址
 
 **快捷方式：** 直接说 `部署到 GH Pages` 或 `发布到线上`
 
@@ -147,7 +169,7 @@ git checkout main
 修复bug → systematic-debugging
 创建技能 → skill-creator
 上传github → git add + commit + push
-部署GH Pages → npx gh-pages -d .
+部署GH Pages → git checkout gh-pages && git merge main && git push
 ```
 
 ---
