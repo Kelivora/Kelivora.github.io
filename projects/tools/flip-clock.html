@@ -138,13 +138,14 @@
       letter-spacing: 2px;
     }
 
-    /* Flipping animation - top flips down, bottom flips up */
+    /* Flipping animation - only top card flips down */
     .flip-card.flipping .card-top {
       transform: rotateX(-180deg);
     }
 
+    /* Bottom card stays in place, just updates its number */
     .flip-card.flipping .card-bottom {
-      transform: rotateX(180deg);
+      transform: rotateX(0);
     }
 
     /* Divider */
@@ -416,12 +417,13 @@
         topNum.textContent = oldValue;
         bottomNum.textContent = newValue;
 
-        // Start flip animation
+        // Start flip animation - only top card flips
         card.classList.add('flipping');
 
-        // After animation: reset - top shows new (bottom now hidden)
+        // After animation: top shows new (already rotated away), bottom shows new
         setTimeout(function() {
           card.classList.remove('flipping');
+          // Reset to show new value in both for next flip
           topNum.textContent = newValue;
           bottomNum.textContent = newValue;
           isFlipping[unit] = false;
