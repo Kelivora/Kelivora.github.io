@@ -23,7 +23,6 @@
       --border-radius: 20px;
       --font-display: 'Noto Serif SC', Georgia, serif;
       --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-      --spine-color: #d4c4a8;
     }
 
     * {
@@ -54,17 +53,16 @@
       max-width: 900px;
     }
 
-    /* 翻牌容器 - 设置3D透视 */
     .clock-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
       flex-wrap: nowrap;
-      perspective: 1200px;
+      perspective: 500px;
     }
 
-    /* ==================== 物理翻牌组件 ==================== */
+    /* Flip Card */
     .flip-card {
       position: relative;
       width: 100px;
@@ -72,143 +70,100 @@
       transform-style: preserve-3d;
     }
 
-    /* 翻牌主体 */
-    .flipper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transform-style: preserve-3d;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* 翻转状态 */
-    .flip-card.flipping .flipper {
-      transform: rotateX(-180deg);
-    }
-
-    /* ==================== 翻牌正面（上半部分） ==================== */
+    /* Upper half - shows top half of current number */
     .card-top {
       position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 50%;
-      backface-visibility: hidden;
-      transform-style: preserve-3d;
       background: var(--card-bg);
       border-radius: var(--border-radius) var(--border-radius) 0 0;
-      box-shadow:
-        0 4px 15px var(--card-shadow),
-        inset 0 1px 0 rgba(255,255,255,0.9);
+      box-shadow: 0 4px 20px var(--card-shadow);
       overflow: hidden;
-      top: 0;
+      transform-origin: bottom;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
+      z-index: 2;
     }
 
-    /* 正面数字 - 上半部分可见 */
-    .card-top::before {
-      content: attr(data-num);
-      display: block;
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%) translateY(0%);
-      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
-      font-size: 88px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1;
-      letter-spacing: 2px;
-      white-space: nowrap;
-      height: 176px; /* 2倍字体高度，确保可裁剪 */
-    }
-
-    /* ==================== 翻牌背面（下半部分） ==================== */
+    /* Lower half - shows bottom half of next number */
     .card-bottom {
       position: absolute;
+      top: 50%;
+      left: 0;
       width: 100%;
       height: 50%;
-      backface-visibility: hidden;
-      transform: rotateX(-180deg);
-      transform-style: preserve-3d;
       background: var(--card-bg);
       border-radius: 0 0 var(--border-radius) var(--border-radius);
-      box-shadow:
-        0 4px 15px var(--card-shadow),
-        inset 0 1px 0 rgba(255,255,255,0.9);
+      box-shadow: 0 4px 20px var(--card-shadow);
       overflow: hidden;
-      top: 50%;
+      transform-origin: top;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
+      z-index: 1;
     }
 
-    /* 背面数字 - 下半部分可见 */
+    /* Hindge line - at top of bottom card */
     .card-bottom::before {
-      content: attr(data-num);
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%) translateY(0%);
-      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
-      font-size: 88px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1;
-      letter-spacing: 2px;
-      white-space: nowrap;
-      height: 176px; /* 2倍字体高度，确保可裁剪 */
-    }
-
-    /* ==================== 翻牌侧面书脊 ==================== */
-    .spine {
-      position: absolute;
-      left: 50%;
-      top: 0;
-      width: 4px;
-      height: 100%;
-      transform: translateX(-50%) rotateY(90deg);
-      background: linear-gradient(
-        to bottom,
-        var(--accent-dark) 0%,
-        var(--accent) 15%,
-        var(--spine-color) 30%,
-        var(--accent) 50%,
-        var(--spine-color) 70%,
-        var(--accent) 85%,
-        var(--accent-dark) 100%
-      );
-      border-radius: 2px;
-      box-shadow: inset 0 0 2px rgba(0,0,0,0.2);
-      z-index: 10;
-    }
-
-    /* ==================== 翻牌厚度层 ==================== */
-    .thickness {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      transform: translateZ(-3px);
-      background: linear-gradient(90deg,
-        rgba(0,0,0,0.1) 0%,
-        rgba(0,0,0,0.03) 30%,
-        transparent 50%,
-        rgba(0,0,0,0.03) 70%,
-        rgba(0,0,0,0.1) 100%
-      );
-      border-radius: var(--border-radius);
-      pointer-events: none;
-    }
-
-    /* ==================== 转轴线 ==================== */
-    .card-bottom::after {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 2px;
+      height: 1px;
       background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
     }
 
-    /* ==================== Divider ==================== */
+    /* Number styling - one number split into top and bottom halves */
+    .card-top .num {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(50%);
+      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+      font-size: 88px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+      letter-spacing: 2px;
+      /* Num positioned at bottom of card, midpoint at 50% */
+      /* card-top overflow:hidden shows only top half of the number */
+    }
+
+    .card-bottom .num {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+      font-size: 88px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+      letter-spacing: 2px;
+      /* Num positioned at top of card, midpoint at 50% */
+      /* card-bottom overflow:hidden shows only bottom half of the number */
+    }
+
+    /* When card-top flips, the backface shows - rotate number inside */
+    .card-top.backface .num {
+      transform: translateX(-50%) translateY(50%) rotateX(180deg);
+    }
+
+    /* Flipping animation - top card flips down like a real flip clock */
+    .flip-card.flipping .card-top {
+      transform: rotateX(-180deg);
+    }
+
+    /* Bottom card is static */
+    .flip-card.flipping .card-bottom {
+      transform: rotateX(0);
+    }
+
+    /* Divider */
     .divider {
       display: flex;
       flex-direction: column;
@@ -235,7 +190,7 @@
       50% { opacity: 1; transform: scale(1.2); }
     }
 
-    /* ==================== Date Display ==================== */
+    /* Date Display */
     .date-display {
       font-family: var(--font-body);
       font-size: 18px;
@@ -244,7 +199,7 @@
       text-transform: uppercase;
     }
 
-    /* ==================== Bottom info ==================== */
+    /* Bottom info */
     .info {
       position: fixed;
       bottom: 30px;
@@ -255,7 +210,7 @@
       text-align: center;
     }
 
-    /* ==================== Control Buttons ==================== */
+    /* Control Buttons */
     .controls {
       display: flex;
       gap: 20px;
@@ -285,7 +240,7 @@
       border-color: var(--accent);
     }
 
-    /* ==================== Seconds cards show/hide ==================== */
+    /* Seconds cards - show/hide with animation */
     .flip-card[data-unit^="seconds"] {
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -297,6 +252,7 @@
       margin-right: 0;
     }
 
+    /* Seconds divider - hide with animation */
     .seconds-divider {
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -308,7 +264,7 @@
       padding: 0;
     }
 
-    /* ==================== Responsive ==================== */
+    /* Mobile Portrait */
     @media (max-width: 600px) and (orientation: portrait) {
       .flip-card {
         width: 55px;
@@ -323,12 +279,12 @@
         border-radius: 0 0 12px 12px;
       }
 
-      .card-top::before, .card-bottom::before {
+      .card-top .num, .card-bottom .num {
         font-size: 48px;
-        height: 96px;
       }
     }
 
+    /* Mobile Landscape */
     @media (max-height: 500px) and (orientation: landscape) {
       .flip-card {
         width: 50px;
@@ -343,9 +299,8 @@
         border-radius: 0 0 10px 10px;
       }
 
-      .card-top::before, .card-bottom::before {
+      .card-top .num, .card-bottom .num {
         font-size: 42px;
-        height: 84px;
       }
 
       .clock-wrapper {
@@ -353,27 +308,27 @@
       }
     }
 
+    /* Small phones */
     @media (max-width: 360px) {
       .flip-card {
         width: 48px;
         height: 75px;
       }
 
-      .card-top::before, .card-bottom::before {
+      .card-top .num, .card-bottom .num {
         font-size: 38px;
-        height: 76px;
       }
     }
 
+    /* Large screens */
     @media (min-width: 1200px) {
       .flip-card {
         width: 130px;
         height: 200px;
       }
 
-      .card-top::before, .card-bottom::before {
+      .card-top .num, .card-bottom .num {
         font-size: 115px;
-        height: 230px;
       }
     }
   </style>
@@ -383,20 +338,12 @@
     <div class="clock-wrapper">
       <!-- Hours -->
       <div class="flip-card" data-unit="hours-tens">
-        <div class="flipper">
-          <div class="card-top" data-num="0"></div>
-          <div class="card-bottom" data-num="0"></div>
-        </div>
-        <div class="spine"></div>
-        <div class="thickness"></div>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
       <div class="flip-card" data-unit="hours-units">
-        <div class="flipper">
-          <div class="card-top" data-num="0"></div>
-          <div class="card-bottom" data-num="0"></div>
-        </div>
-        <div class="spine"></div>
-        <div class="thickness"></div>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
 
       <!-- Divider -->
@@ -407,20 +354,12 @@
 
       <!-- Minutes -->
       <div class="flip-card" data-unit="minutes-tens">
-        <div class="flipper">
-          <div class="card-top" data-num="0"></div>
-          <div class="card-bottom" data-num="0"></div>
-        </div>
-        <div class="spine"></div>
-        <div class="thickness"></div>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
       <div class="flip-card" data-unit="minutes-units">
-        <div class="flipper">
-          <div class="card-top" data-num="0"></div>
-          <div class="card-bottom" data-num="0"></div>
-        </div>
-        <div class="spine"></div>
-        <div class="thickness"></div>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
 
       <!-- Divider -->
@@ -431,20 +370,12 @@
 
       <!-- Seconds -->
       <div class="flip-card" data-unit="seconds-tens">
-        <div class="flipper">
-          <div class="card-top" data-num="0"></div>
-          <div class="card-bottom" data-num="0"></div>
-        </div>
-        <div class="spine"></div>
-        <div class="thickness"></div>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
       <div class="flip-card" data-unit="seconds-units">
-        <div class="flipper">
-          <div class="card-top" data-num="0"></div>
-          <div class="card-bottom" data-num="0"></div>
-        </div>
-        <div class="spine"></div>
-        <div class="thickness"></div>
+        <div class="card-top"><span class="num">0</span></div>
+        <div class="card-bottom"><span class="num">0</span></div>
       </div>
     </div>
 
@@ -494,30 +425,44 @@
 
         isFlipping[unit] = true;
 
-        const flipper = card.querySelector('.flipper');
-        const cardTop = card.querySelector('.card-top');
-        const cardBottom = card.querySelector('.card-bottom');
+        var topCard = card.querySelector('.card-top');
+        var bottomCard = card.querySelector('.card-bottom');
+        var topNum = card.querySelector('.card-top .num');
+        var bottomNum = card.querySelector('.card-bottom .num');
 
-        // 设置数字
-        cardTop.dataset.num = oldValue;
-        cardBottom.dataset.num = oldValue;
+        // Before flip: both show old number (so it looks like one complete number)
+        topNum.textContent = oldValue;
+        bottomNum.textContent = oldValue;
 
-        // 开始翻转动画
+        // Ensure proper z-index for initial state
+        topCard.style.zIndex = 2;
+        bottomCard.style.zIndex = 1;
+
+        // Start flip animation - top card flips down
         card.classList.add('flipping');
 
-        // 翻转一半时更新背面数字
-        setTimeout(() => {
-          cardBottom.dataset.num = newValue;
-        }, 300);
+        // Halfway through animation (at 90 degrees rotation):
+        // - Bottom card becomes visible showing new number
+        // - Top card backface shows old number rotated 180 degrees
+        setTimeout(function() {
+          bottomNum.textContent = newValue;
+          bottomCard.style.zIndex = 2;  // Bottom card comes to front
+          topCard.style.zIndex = 1;     // Top card goes to back
+          topCard.classList.add('backface');
+        }, 250);
 
-        // 翻转完成
-        setTimeout(() => {
+        // After animation completes: reset for next flip
+        setTimeout(function() {
           card.classList.remove('flipping');
-          // 更新数字为新值，准备下一次翻转
-          cardTop.dataset.num = newValue;
-          cardBottom.dataset.num = newValue;
+          topCard.classList.remove('backface');
+          // Reset z-index for normal state
+          topCard.style.zIndex = 2;
+          bottomCard.style.zIndex = 1;
+          // Both show new value for next flip cycle
+          topNum.textContent = newValue;
+          bottomNum.textContent = newValue;
           isFlipping[unit] = false;
-        }, 600);
+        }, 500);
       }
 
       function updateDate() {
@@ -573,8 +518,8 @@
             case 'seconds-tens': value = time.secondsTens; break;
             case 'seconds-units': value = time.secondsUnits; break;
           }
-          card.querySelector('.card-top').dataset.num = value;
-          card.querySelector('.card-bottom').dataset.num = value;
+          card.querySelector('.card-top .num').textContent = value;
+          card.querySelector('.card-bottom .num').textContent = value;
         });
 
         lastTime = time;
