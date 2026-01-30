@@ -3,21 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>翻页时钟</title>
+  <title>时钟</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-primary: #faf9f7;
-      --bg-secondary: #f5f3f0;
-      --bg-tertiary: #efeae5;
       --text-primary: #1a1a18;
       --text-secondary: #8a8a83;
-      --text-muted: #aca9a2;
       --accent: #c4a574;
-      --accent-light: #e8dcc8;
-      --accent-dark: #a08050;
       --card-bg: #ffffff;
       --card-shadow: rgba(0, 0, 0, 0.08);
       --border-radius: 20px;
@@ -59,111 +54,30 @@
       justify-content: center;
       gap: 12px;
       flex-wrap: nowrap;
-      perspective: 500px;
     }
 
-    /* Flip Card */
-    .flip-card {
-      position: relative;
+    .digit-card {
       width: 100px;
       height: 150px;
-      transform-style: preserve-3d;
-    }
-
-    /* Upper half - shows top half of current number */
-    .card-top {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 50%;
       background: var(--card-bg);
-      border-radius: var(--border-radius) var(--border-radius) 0 0;
+      border-radius: var(--border-radius);
       box-shadow: 0 4px 20px var(--card-shadow);
-      overflow: hidden;
-      transform-origin: bottom;
-      backface-visibility: hidden;
-      transform-style: preserve-3d;
-      transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
-      z-index: 2;
-    }
-
-    /* Lower half - shows bottom half of next number */
-    .card-bottom {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      width: 100%;
-      height: 50%;
-      background: var(--card-bg);
-      border-radius: 0 0 var(--border-radius) var(--border-radius);
-      box-shadow: 0 4px 20px var(--card-shadow);
-      overflow: hidden;
-      transform-origin: top;
-      backface-visibility: hidden;
-      transform-style: preserve-3d;
-      transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
-      z-index: 1;
-    }
-
-    /* Hindge line - at top of bottom card */
-    .card-bottom::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
-    }
-
-    /* Number styling - one number split into top and bottom halves */
-    .card-top .num {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%) translateY(50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
       font-size: 88px;
       font-weight: 600;
       color: var(--text-primary);
-      line-height: 1;
       letter-spacing: 2px;
-      /* Num positioned at bottom of card, midpoint at 50% */
-      /* card-top overflow:hidden shows only top half of the number */
+      transition: all 0.3s ease;
     }
 
-    .card-bottom .num {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%) translateY(-50%);
-      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
-      font-size: 88px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1;
-      letter-spacing: 2px;
-      /* Num positioned at top of card, midpoint at 50% */
-      /* card-bottom overflow:hidden shows only bottom half of the number */
+    .digit-card.changing {
+      transform: scale(0.95);
+      opacity: 0.7;
     }
 
-    /* When card-top flips, the backface shows - rotate number inside */
-    .card-top.backface .num {
-      transform: translateX(-50%) translateY(50%) rotateX(180deg);
-    }
-
-    /* Flipping animation - top card flips down like a real flip clock */
-    .flip-card.flipping .card-top {
-      transform: rotateX(-180deg);
-    }
-
-    /* Bottom card is static */
-    .flip-card.flipping .card-bottom {
-      transform: rotateX(0);
-    }
-
-    /* Divider */
     .divider {
       display: flex;
       flex-direction: column;
@@ -190,7 +104,6 @@
       50% { opacity: 1; transform: scale(1.2); }
     }
 
-    /* Date Display */
     .date-display {
       font-family: var(--font-body);
       font-size: 18px;
@@ -199,18 +112,16 @@
       text-transform: uppercase;
     }
 
-    /* Bottom info */
     .info {
       position: fixed;
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 14px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       text-align: center;
     }
 
-    /* Control Buttons */
     .controls {
       display: flex;
       gap: 20px;
@@ -224,35 +135,33 @@
       font-weight: 500;
       color: var(--text-primary);
       background: var(--card-bg);
-      border: 1px solid var(--accent-light);
+      border: 1px solid var(--accent);
       border-radius: var(--border-radius);
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .control-btn:hover {
-      background: var(--accent-light);
+      background: var(--accent);
+      color: white;
     }
 
     .control-btn.active {
       background: var(--accent);
       color: white;
-      border-color: var(--accent);
     }
 
-    /* Seconds cards - show/hide with animation */
-    .flip-card[data-unit^="seconds"] {
+    .digit-card[data-unit^="seconds"] {
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .flip-card[data-unit^="seconds"].hidden {
+    .digit-card[data-unit^="seconds"].hidden {
       width: 0;
       opacity: 0;
       margin-left: 0;
       margin-right: 0;
     }
 
-    /* Seconds divider - hide with animation */
     .seconds-divider {
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -264,42 +173,20 @@
       padding: 0;
     }
 
-    /* Mobile Portrait */
     @media (max-width: 600px) and (orientation: portrait) {
-      .flip-card {
+      .digit-card {
         width: 55px;
         height: 85px;
-      }
-
-      .card-top, .card-bottom {
-        border-radius: 12px 12px 0 0;
-      }
-
-      .card-bottom {
-        border-radius: 0 0 12px 12px;
-      }
-
-      .card-top .num, .card-bottom .num {
+        border-radius: 12px;
         font-size: 48px;
       }
     }
 
-    /* Mobile Landscape */
     @media (max-height: 500px) and (orientation: landscape) {
-      .flip-card {
+      .digit-card {
         width: 50px;
         height: 80px;
-      }
-
-      .card-top, .card-bottom {
-        border-radius: 10px 10px 0 0;
-      }
-
-      .card-bottom {
-        border-radius: 0 0 10px 10px;
-      }
-
-      .card-top .num, .card-bottom .num {
+        border-radius: 10px;
         font-size: 42px;
       }
 
@@ -308,26 +195,18 @@
       }
     }
 
-    /* Small phones */
     @media (max-width: 360px) {
-      .flip-card {
+      .digit-card {
         width: 48px;
         height: 75px;
-      }
-
-      .card-top .num, .card-bottom .num {
         font-size: 38px;
       }
     }
 
-    /* Large screens */
     @media (min-width: 1200px) {
-      .flip-card {
+      .digit-card {
         width: 130px;
         height: 200px;
-      }
-
-      .card-top .num, .card-bottom .num {
         font-size: 115px;
       }
     }
@@ -336,47 +215,24 @@
 <body>
   <div class="clock-container">
     <div class="clock-wrapper">
-      <!-- Hours -->
-      <div class="flip-card" data-unit="hours-tens">
-        <div class="card-top"><span class="num">0</span></div>
-        <div class="card-bottom"><span class="num">0</span></div>
-      </div>
-      <div class="flip-card" data-unit="hours-units">
-        <div class="card-top"><span class="num">0</span></div>
-        <div class="card-bottom"><span class="num">0</span></div>
-      </div>
+      <div class="digit-card" data-unit="hours-tens">0</div>
+      <div class="digit-card" data-unit="hours-units">0</div>
 
-      <!-- Divider -->
       <div class="divider">
         <div class="divider-dot"></div>
         <div class="divider-dot"></div>
       </div>
 
-      <!-- Minutes -->
-      <div class="flip-card" data-unit="minutes-tens">
-        <div class="card-top"><span class="num">0</span></div>
-        <div class="card-bottom"><span class="num">0</span></div>
-      </div>
-      <div class="flip-card" data-unit="minutes-units">
-        <div class="card-top"><span class="num">0</span></div>
-        <div class="card-bottom"><span class="num">0</span></div>
-      </div>
+      <div class="digit-card" data-unit="minutes-tens">0</div>
+      <div class="digit-card" data-unit="minutes-units">0</div>
 
-      <!-- Divider -->
       <div class="divider seconds-divider">
         <div class="divider-dot"></div>
         <div class="divider-dot"></div>
       </div>
 
-      <!-- Seconds -->
-      <div class="flip-card" data-unit="seconds-tens">
-        <div class="card-top"><span class="num">0</span></div>
-        <div class="card-bottom"><span class="num">0</span></div>
-      </div>
-      <div class="flip-card" data-unit="seconds-units">
-        <div class="card-top"><span class="num">0</span></div>
-        <div class="card-bottom"><span class="num">0</span></div>
-      </div>
+      <div class="digit-card" data-unit="seconds-tens">0</div>
+      <div class="digit-card" data-unit="seconds-units">0</div>
     </div>
 
     <div class="date-display" id="date"></div>
@@ -398,7 +254,6 @@
       let use12Hour = false;
       let showSeconds = true;
       let lastTime = {};
-      let isFlipping = {};
 
       function getCurrentTime() {
         const now = new Date();
@@ -419,97 +274,62 @@
         };
       }
 
-      function flipCard(unit, newValue, oldValue) {
+      function updateDigit(unit, value) {
         const card = document.querySelector('[data-unit="' + unit + '"]');
-        if (!card || isFlipping[unit]) return;
+        if (!card) return;
 
-        isFlipping[unit] = true;
-
-        var topCard = card.querySelector('.card-top');
-        var bottomCard = card.querySelector('.card-bottom');
-        var topNum = card.querySelector('.card-top .num');
-        var bottomNum = card.querySelector('.card-bottom .num');
-
-        // Before flip: both show old number (so it looks like one complete number)
-        topNum.textContent = oldValue;
-        bottomNum.textContent = oldValue;
-
-        // Ensure proper z-index for initial state
-        topCard.style.zIndex = 2;
-        bottomCard.style.zIndex = 1;
-
-        // Start flip animation - top card flips down
-        card.classList.add('flipping');
-
-        // Halfway through animation (at 90 degrees rotation):
-        // - Bottom card becomes visible showing new number
-        // - Top card backface shows old number rotated 180 degrees
-        setTimeout(function() {
-          bottomNum.textContent = newValue;
-          bottomCard.style.zIndex = 2;  // Bottom card comes to front
-          topCard.style.zIndex = 1;     // Top card goes to back
-          topCard.classList.add('backface');
-        }, 250);
-
-        // After animation completes: reset for next flip
-        setTimeout(function() {
-          card.classList.remove('flipping');
-          topCard.classList.remove('backface');
-          // Reset z-index for normal state
-          topCard.style.zIndex = 2;
-          bottomCard.style.zIndex = 1;
-          // Both show new value for next flip cycle
-          topNum.textContent = newValue;
-          bottomNum.textContent = newValue;
-          isFlipping[unit] = false;
-        }, 500);
+        card.classList.add('changing');
+        setTimeout(() => {
+          card.textContent = value;
+          card.classList.remove('changing');
+        }, 150);
       }
 
       function updateDate() {
-        var dateEl = document.getElementById('date');
-        var now = new Date();
-        var year = now.getFullYear();
-        var month = now.getMonth() + 1;
-        var day = now.getDate();
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
 
-        dateEl.innerHTML = '<span style="color: var(--text-primary)">' + year + '年' + month + '月' + day + '日</span> ' + weekDays[now.getDay()];
+        document.getElementById('date').innerHTML =
+          '<span style="color: var(--text-primary)">' + year + '年' + month + '月' + day + '日</span> ' + weekDays[now.getDay()];
       }
 
       function updateClock() {
-        var time = getCurrentTime();
+        const time = getCurrentTime();
 
         if (showSeconds) {
           if (lastTime.secondsTens !== undefined && time.secondsTens !== lastTime.secondsTens) {
-            flipCard('seconds-tens', time.secondsTens, lastTime.secondsTens);
+            updateDigit('seconds-tens', time.secondsTens);
           }
           if (lastTime.secondsUnits !== undefined && time.secondsUnits !== lastTime.secondsUnits) {
-            flipCard('seconds-units', time.secondsUnits, lastTime.secondsUnits);
+            updateDigit('seconds-units', time.secondsUnits);
           }
         }
 
         if (lastTime.minutesTens !== undefined && time.minutesTens !== lastTime.minutesTens) {
-          flipCard('minutes-tens', time.minutesTens, lastTime.minutesTens);
+          updateDigit('minutes-tens', time.minutesTens);
         }
         if (lastTime.minutesUnits !== undefined && time.minutesUnits !== lastTime.minutesUnits) {
-          flipCard('minutes-units', time.minutesUnits, lastTime.minutesUnits);
+          updateDigit('minutes-units', time.minutesUnits);
         }
 
         if (lastTime.hoursTens !== undefined && time.hoursTens !== lastTime.hoursTens) {
-          flipCard('hours-tens', time.hoursTens, lastTime.hoursTens);
+          updateDigit('hours-tens', time.hoursTens);
         }
         if (lastTime.hoursUnits !== undefined && time.hoursUnits !== lastTime.hoursUnits) {
-          flipCard('hours-units', time.hoursUnits, lastTime.hoursUnits);
+          updateDigit('hours-units', time.hoursUnits);
         }
 
         lastTime = time;
       }
 
       function init() {
-        var time = getCurrentTime();
+        const time = getCurrentTime();
 
-        document.querySelectorAll('.flip-card').forEach(function(card) {
-          var unit = card.dataset.unit;
-          var value;
+        document.querySelectorAll('.digit-card').forEach(card => {
+          const unit = card.dataset.unit;
+          let value;
           switch(unit) {
             case 'hours-tens': value = time.hoursTens; break;
             case 'hours-units': value = time.hoursUnits; break;
@@ -518,8 +338,7 @@
             case 'seconds-tens': value = time.secondsTens; break;
             case 'seconds-units': value = time.secondsUnits; break;
           }
-          card.querySelector('.card-top .num').textContent = value;
-          card.querySelector('.card-bottom .num').textContent = value;
+          card.textContent = value;
         });
 
         lastTime = time;
@@ -540,10 +359,10 @@
       document.getElementById('btn-sec').addEventListener('click', function() {
         showSeconds = !showSeconds;
         this.classList.toggle('active', showSeconds);
-        var secCards = document.querySelectorAll('[data-unit^="seconds"]');
-        var secDivider = document.querySelector('.seconds-divider');
-        secCards.forEach(function(card) { card.classList.toggle('hidden', !showSeconds); });
-        secDivider.classList.toggle('hidden', !showSeconds);
+        document.querySelectorAll('[data-unit^="seconds"]').forEach(card => {
+          card.classList.toggle('hidden', !showSeconds);
+        });
+        document.querySelector('.seconds-divider').classList.toggle('hidden', !showSeconds);
       });
 
       init();
