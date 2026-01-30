@@ -62,7 +62,7 @@ const projects = [
     title: "幸运轮",
     url: "projects/tools/lucky-wheel.html",
     icon: "🎡",
-    desc: "随机决策转一转，让命运替你做选择",
+    desc: "随机闪烁选择，让命运替你做决定",
     tags: [{ text: "工具", new: false }]
   },
   {
