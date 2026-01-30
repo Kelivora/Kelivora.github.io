@@ -63,6 +63,13 @@ const projects = [
     url: "projects/tools/lucky-wheel.html",
     icon: "🎡",
     desc: "随机决策转一转，让命运替你做选择",
+    tags: [{ text: "工具", new: false }]
+  },
+  {
+    title: "临时二维码",
+    url: "projects/tools/qr-generator.html",
+    icon: "📱",
+    desc: "文字、网址、WiFi二维码生成，截图后即关闭",
     tags: [{ text: "工具", new: true }]
   }
 ];
