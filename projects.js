@@ -56,6 +56,13 @@ const projects = [
     url: "projects/tools/bill-splitter.html",
     icon: "💰",
     desc: "AA制分账计算器，超大字体方便举起来展示",
+    tags: [{ text: "工具", new: false }]
+  },
+  {
+    title: "幸运轮",
+    url: "projects/tools/lucky-wheel.html",
+    icon: "🎡",
+    desc: "随机决策转一转，让命运替你做选择",
     tags: [{ text: "工具", new: true }]
   }
 ];

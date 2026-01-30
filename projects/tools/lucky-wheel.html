@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>幸运轮</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #faf9f7;
+      --bg-secondary: #f5f3f0;
+      --text-primary: #1a1a18;
+      --text-secondary: #5c5c57;
+      --text-muted: #aca9a2;
+      --accent: #c4a574;
+      --accent-dark: #a08050;
+      --card-bg: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.08);
+      --radius: 20px;
+      --wheel-border: #1a1a18;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .wheel-section {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+      box-shadow:
+        0 0 0 8px var(--wheel-border),
+        0 0 0 12px var(--accent),
+        0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .wheel-segment {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      top: 0;
+      right: 0;
+      transform-origin: bottom left;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wheel-segment-inner {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 60%;
+    }
+
+    .wheel-segment-inner span {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      white-space: nowrap;
+      transform: rotate(45deg);
+    }
+
+    .wheel-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      background: var(--wheel-border);
+      border-radius: 50%;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .wheel-center::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+    }
+
+    .pointer svg {
+      width: 40px;
+      height: 50px;
+    }
+
+    .pointer-triangle {
+      fill: var(--wheel-border);
+    }
+
+    .spin-btn {
+      display: block;
+      width: 100%;
+      padding: 20px;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(196, 165, 116, 0.3);
+    }
+
+    .spin-btn:hover:not(:disabled) {
+      background: var(--accent-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(196, 165, 116, 0.4);
+    }
+
+    .spin-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .result-display {
+      display: none;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 4px 24px var(--shadow);
+      margin-bottom: 24px;
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .result-display.show {
+      display: block;
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .result-text {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(1.8rem, 7vw, 2.5rem);
+      font-weight: 700;
+      color: var(--accent-dark);
+      line-height: 1.3;
+    }
+
+    .options-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 4px 24px var(--shadow);
+    }
+
+    .options-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .options-title {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .add-option-btn {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-secondary);
+      border: 2px solid var(--bg-tertiary);
+      border-radius: 20px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .add-option-btn:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .add-option-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .option-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .option-input {
+      flex: 1;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-family: 'Outfit', sans-serif;
+      border: 2px solid var(--bg-tertiary);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .option-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--card-bg);
+    }
+
+    .option-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .remove-option-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      background: var(--bg-secondary);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .remove-option-btn:hover {
+      background: #fee;
+      color: #c45c5c;
+    }
+
+    .wheel-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      transform: rotate(0deg);
+    }
+
+    .result-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .result-hint.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 400px) {
+      body {
+        padding: 16px;
+      }
+
+      .wheel-container {
+        width: 240px;
+        height: 240px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>幸运轮</h1>
+      <p class="subtitle">转一下，让命运决定</p>
+    </header>
+
+    <div class="result-display" id="resultDisplay">
+      <div class="result-label">🎉 选中的是</div>
+      <div class="result-text" id="resultText"></div>
+    </div>
+
+    <div class="wheel-section">
+      <div class="pointer">
+        <svg viewBox="0 0 40 50">
+          <path class="pointer-triangle" d="M20 0 L40 50 L0 50 Z"/>
+        </svg>
+      </div>
+      <div class="wheel-container">
+        <div class="wheel" id="wheel"></div>
+        <div class="wheel-center"></div>
+      </div>
+      <div class="result-hint" id="resultHint">举起来给大家看</div>
+    </div>
+
+    <button class="spin-btn" id="spinBtn">开始旋转</button>
+
+    <div class="options-section" style="margin-top: 24px;">
+      <div class="options-header">
+        <span class="options-title">添加 2-6 个选项</span>
+        <button class="add-option-btn" id="addOptionBtn">+ 添加</button>
+      </div>
+      <div class="options-list" id="optionsList"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const wheel = document.getElementById('wheel');
+      const spinBtn = document.getElementById('spinBtn');
+      const optionsList = document.getElementById('optionsList');
+      const addOptionBtn = document.getElementById('addOptionBtn');
+      const resultDisplay = document.getElementById('resultDisplay');
+      const resultText = document.getElementById('resultText');
+      const resultHint = document.getElementById('resultHint');
+
+      const colors = [
+        '#c45c5c', // 红
+        '#5c8cc4', // 蓝
+        '#5cc483', // 绿
+        '#c4a55c', // 黄
+        '#9c5cc4', // 紫
+        '#5cc4c4', // 青
+      ];
+
+      let options = ['拉面', '寿司', '沙拉'];
+      let rotation = 0;
+      let isSpinning = false;
+
+      function initOptions() {
+        optionsList.innerHTML = '';
+        options.forEach((opt, i) => {
+          addOptionInput(opt, i);
+        });
+        updateWheel();
+      }
+
+      function addOptionInput(value = '', index = null) {
+        const item = document.createElement('div');
+        item.className = 'option-item';
+        item.style.animationDelay = (index !== null ? index * 0.05 : options.length * 0.05) + 's';
+
+        const color = document.createElement('div');
+        color.className = 'option-color';
+        color.style.background = colors[(index !== null ? index : options.length) % colors.length];
+
+        const input = document.createElement('input');
+        input.className = 'option-input';
+        input.type = 'text';
+        input.placeholder = '输入选项...';
+        input.value = value;
+        input.addEventListener('input', function() {
+          if (index !== null) {
+            options[index] = this.value;
+          } else {
+            options.push(this.value);
+          }
+          updateWheel();
+          updateAddButton();
+        });
+        input.addEventListener('blur', function() {
+          if (!this.value.trim()) {
+            if (options.length > 2) {
+              options.splice(index, 1);
+              initOptions();
+            } else {
+              this.value = options[index];
+            }
+          }
+        });
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-option-btn';
+        removeBtn.innerHTML = '×';
+        removeBtn.title = '删除';
+        removeBtn.addEventListener('click', function() {
+          if (options.length > 2) {
+            options.splice(index, 1);
+            initOptions();
+          }
+        });
+
+        item.appendChild(color);
+        item.appendChild(input);
+        item.appendChild(removeBtn);
+        optionsList.appendChild(item);
+
+        updateAddButton();
+      }
+
+      function updateAddButton() {
+        addOptionBtn.disabled = options.length >= 6;
+      }
+
+      function updateWheel() {
+        const validOptions = options.filter(o => o.trim());
+        if (validOptions.length < 2) {
+          wheel.innerHTML = '<div class="wheel-bg" style="background: var(--bg-secondary);"></div>';
+          spinBtn.disabled = true;
+          return;
+        }
+
+        spinBtn.disabled = isSpinning;
+
+        const segmentAngle = 360 / validOptions.length;
+        wheel.innerHTML = '';
+
+        validOptions.forEach((opt, i) => {
+          const segment = document.createElement('div');
+          segment.className = 'wheel-segment';
+          segment.style.transform = `rotate(${i * segmentAngle - 90 + segmentAngle / 2}deg) skewY(${90 - segmentAngle}deg)`;
+          segment.style.background = colors[i % colors.length];
+
+          const inner = document.createElement('div');
+          inner.className = 'wheel-segment-inner';
+          inner.innerHTML = `<span>${escapeHtml(opt)}</span>`;
+
+          segment.appendChild(inner);
+          wheel.appendChild(segment);
+        });
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function spin() {
+        const validOptions = options.filter(o => o.trim());
+        if (validOptions.length < 2 || isSpinning) return;
+
+        isSpinning = true;
+        spinBtn.disabled = true;
+        resultDisplay.classList.remove('show');
+        resultHint.classList.remove('show');
+
+        // 随机选择结果
+        const winnerIndex = Math.floor(Math.random() * validOptions.length);
+        const segmentAngle = 360 / validOptions.length;
+
+        // 计算需要旋转的角度
+        // 指针在顶部（0度），所以要旋转到让选中区域转到顶部
+        // 每个扇区从 -90 开始，计算中心点
+        const targetAngle = winnerIndex * segmentAngle + segmentAngle / 2;
+        const spins = 5 + Math.floor(Math.random() * 3); // 5-7圈
+        const extraRotation = 360 - targetAngle; // 转到顶部
+        const totalRotation = spins * 360 + extraRotation;
+
+        rotation += totalRotation;
+        wheel.style.transform = `rotate(${rotation}deg)`;
+
+        setTimeout(() => {
+          isSpinning = false;
+          spinBtn.disabled = false;
+          resultText.textContent = validOptions[winnerIndex];
+          resultDisplay.classList.add('show');
+          resultHint.classList.add('show');
+        }, 4000);
+      }
+
+      addOptionBtn.addEventListener('click', function() {
+        if (options.length < 6) {
+          addOptionInput('', options.length);
+          updateWheel();
+        }
+      });
+
+      spinBtn.addEventListener('click', spin);
+
+      // 页面刷新时重置
+      window.addEventListener('beforeunload', function() {
+        // 不保存任何数据
+      });
+
+      // 初始化
+      initOptions();
+    })();
+  </script>
+</body>
+</html>
