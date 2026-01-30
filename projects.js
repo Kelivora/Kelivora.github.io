@@ -49,6 +49,13 @@ const projects = [
     url: "projects/tools/flip-clock.html",
     icon: "⏱️",
     desc: "简洁的数字时钟，支持响应式布局和12/24小时切换",
+    tags: [{ text: "工具", new: false }]
+  },
+  {
+    title: "聚餐分账",
+    url: "projects/tools/bill-splitter.html",
+    icon: "💰",
+    desc: "AA制分账计算器，超大字体方便举起来展示",
     tags: [{ text: "工具", new: true }]
   }
 ];

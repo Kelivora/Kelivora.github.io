@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>聚餐分账</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #faf9f7;
+      --bg-secondary: #f5f3f0;
+      --bg-tertiary: #efeae5;
+      --text-primary: #1a1a18;
+      --text-secondary: #5c5c57;
+      --text-muted: #aca9a2;
+      --accent: #c4a574;
+      --accent-light: #e8dcc8;
+      --accent-dark: #a08050;
+      --card-bg: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.08);
+      --radius: 20px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    h1 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .input-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: 0 4px 24px var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      margin-bottom: 24px;
+    }
+
+    .input-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 18px 20px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      border: 2px solid var(--bg-tertiary);
+      border-radius: 14px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .input-wrapper input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--card-bg);
+      box-shadow: 0 0 0 4px rgba(196, 165, 116, 0.1);
+    }
+
+    .input-wrapper .unit {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .input-wrapper input.has-unit {
+      padding-right: 50px;
+    }
+
+    .toggle-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: 0 4px 24px var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+    }
+
+    .toggle-item:not(:last-child) {
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .toggle-icon {
+      font-size: 1.2rem;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      cursor: pointer;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-tertiary);
+      border-radius: 28px;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 3px;
+      top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background: var(--accent);
+    }
+
+    .toggle-switch input:checked + .toggle-slider::before {
+      transform: translateX(24px);
+    }
+
+    .toggle-extra {
+      display: none;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--bg-tertiary);
+      animation: slideDown 0.3s ease;
+    }
+
+    .toggle-extra.show {
+      display: block;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .percentage-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .percentage-input input {
+      width: 80px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      border: 2px solid var(--bg-tertiary);
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .percentage-input input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .percentage-input span {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+
+    .person-selector {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .person-btn {
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: 2px solid var(--bg-tertiary);
+      border-radius: 25px;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .person-btn:hover {
+      border-color: var(--accent-light);
+    }
+
+    .person-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .result-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      box-shadow: 0 4px 24px var(--shadow);
+      text-align: center;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: all 0.4s ease;
+    }
+
+    .result-empty {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .result-amount {
+      margin-bottom: 12px;
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .result-value {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(3rem, 12vw, 5rem);
+      font-weight: 700;
+      color: var(--accent-dark);
+      line-height: 1.1;
+      animation: countUp 0.5s ease;
+    }
+
+    @keyframes countUp {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .result-person {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--bg-tertiary);
+    }
+
+    .person-amount {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-radius: 14px;
+      min-width: 80px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .person-amount.free {
+      background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
+      opacity: 0.6;
+    }
+
+    .person-amount .name {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .person-amount .amount {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .person-amount.free .amount {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .clear-btn {
+      display: none;
+      width: 100%;
+      margin-top: 20px;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-secondary);
+      border: 2px solid var(--bg-tertiary);
+      border-radius: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .clear-btn:hover {
+      background: var(--text-primary);
+      border-color: var(--text-primary);
+      color: white;
+    }
+
+    .result-section.has-result .clear-btn {
+      display: block;
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 400px) {
+      body {
+        padding: 16px;
+      }
+
+      .input-section, .toggle-section, .result-section {
+        padding: 20px;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .result-person {
+        gap: 10px;
+      }
+
+      .person-amount {
+        min-width: 65px;
+        padding: 10px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>聚餐分账</h1>
+      <p class="subtitle">举起来给大家看</p>
+    </header>
+
+    <div class="input-section">
+      <div class="input-group">
+        <label class="input-label">总金额</label>
+        <div class="input-row">
+          <div class="input-wrapper">
+            <input type="number" id="totalAmount" class="has-unit" placeholder="0" inputmode="decimal" />
+            <span class="unit">元</span>
+          </div>
+          <div class="input-wrapper">
+            <input type="number" id="personCount" class="has-unit" placeholder="0" inputmode="numeric" />
+            <span class="unit">人</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toggle-section">
+      <div class="toggle-item">
+        <label class="toggle-label">
+          <span class="toggle-icon">💼</span>
+          <span>含服务费</span>
+        </label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="hasServiceFee" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-extra" id="serviceFeeExtra">
+        <div class="percentage-input">
+          <input type="number" id="serviceFeePercent" value="10" min="0" max="100" inputmode="decimal" />
+          <span>%</span>
+        </div>
+      </div>
+
+      <div class="toggle-item">
+        <label class="toggle-label">
+          <span class="toggle-icon">🎁</span>
+          <span>某人免单</span>
+        </label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="hasFreePerson" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-extra" id="freePersonExtra">
+        <div class="person-selector" id="personSelector">
+          <!-- 动态生成 -->
+        </div>
+      </div>
+    </div>
+
+    <div class="result-section" id="resultSection">
+      <div class="result-empty" id="resultEmpty">
+        输入金额后自动计算
+      </div>
+      <div class="result-amount" id="resultAmount" style="display: none;">
+        <div class="result-label">每人应付</div>
+        <div class="result-value" id="perPersonValue">0</div>
+      </div>
+      <div class="result-person" id="resultPerson" style="display: none;"></div>
+      <button class="clear-btn" id="clearBtn">清空重新算</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const totalAmountInput = document.getElementById('totalAmount');
+      const personCountInput = document.getElementById('personCount');
+      const hasServiceFee = document.getElementById('hasServiceFee');
+      const serviceFeePercent = document.getElementById('serviceFeePercent');
+      const serviceFeeExtra = document.getElementById('serviceFeeExtra');
+      const hasFreePerson = document.getElementById('hasFreePerson');
+      const freePersonExtra = document.getElementById('freePersonExtra');
+      const personSelector = document.getElementById('personSelector');
+      const resultEmpty = document.getElementById('resultEmpty');
+      const resultAmount = document.getElementById('resultAmount');
+      const perPersonValue = document.getElementById('perPersonValue');
+      const resultPerson = document.getElementById('resultPerson');
+      const resultSection = document.getElementById('resultSection');
+      const clearBtn = document.getElementById('clearBtn');
+
+      let freePersonIndex = null;
+
+      // 服务费开关
+      hasServiceFee.addEventListener('change', function() {
+        serviceFeeExtra.classList.toggle('show', this.checked);
+        calculate();
+      });
+
+      serviceFeePercent.addEventListener('input', calculate);
+
+      // 免单人开关
+      hasFreePerson.addEventListener('change', function() {
+        freePersonExtra.classList.toggle('show', this.checked);
+        calculate();
+      });
+
+      // 更新人数选择器
+      function updatePersonSelector() {
+        const count = parseInt(personCountInput.value) || 0;
+        if (count < 2) {
+          hasFreePerson.checked = false;
+          freePersonExtra.classList.remove('show');
+        }
+        if (hasFreePerson.checked && count >= 2) {
+          if (freePersonIndex >= count) freePersonIndex = null;
+          const buttons = [];
+          for (let i = 1; i <= count; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'person-btn' + (freePersonIndex === i - 1 ? ' active' : '');
+            btn.textContent = '第 ' + i + ' 人';
+            btn.addEventListener('click', function() {
+              freePersonIndex = (freePersonIndex === i - 1) ? null : (i - 1);
+              updatePersonSelector();
+              calculate();
+            });
+            buttons.push(btn);
+          }
+          personSelector.innerHTML = '';
+          buttons.forEach(btn => personSelector.appendChild(btn));
+        } else {
+          personSelector.innerHTML = '';
+        }
+      }
+
+      personCountInput.addEventListener('input', function() {
+        updatePersonSelector();
+        calculate();
+      });
+
+      totalAmountInput.addEventListener('input', calculate);
+
+      function calculate() {
+        const total = parseFloat(totalAmountInput.value) || 0;
+        const count = parseInt(personCountInput.value) || 0;
+
+        if (total <= 0 || count <= 0) {
+          showEmpty();
+          return;
+        }
+
+        // 计算服务费
+        let finalTotal = total;
+        if (hasServiceFee.checked) {
+          const feePercent = parseFloat(serviceFeePercent.value) || 0;
+          finalTotal = total * (1 + feePercent / 100);
+        }
+
+        // 确认免单人
+        let payingCount = count;
+        if (hasFreePerson.checked && freePersonIndex !== null) {
+          payingCount = count - 1;
+        }
+
+        if (payingCount <= 0) {
+          showEmpty();
+          return;
+        }
+
+        const perPerson = finalTotal / payingCount;
+
+        showResult(perPerson, count, freePersonIndex);
+      }
+
+      function showEmpty() {
+        resultEmpty.style.display = 'block';
+        resultAmount.style.display = 'none';
+        resultPerson.style.display = 'none';
+        resultSection.classList.remove('has-result');
+      }
+
+      function showResult(perPerson, count, freeIndex) {
+        resultEmpty.style.display = 'none';
+        resultAmount.style.display = 'block';
+        resultPerson.style.display = 'flex';
+        resultSection.classList.add('has-result');
+
+        // 更新每人应付金额
+        perPersonValue.textContent = '¥' + perPerson.toFixed(2);
+
+        // 更新明细
+        const personDivs = [];
+        for (let i = 0; i < count; i++) {
+          const div = document.createElement('div');
+          div.className = 'person-amount' + (freeIndex === i ? ' free' : '');
+          div.innerHTML = `
+            <span class="name">第 ${i + 1} 人</span>
+            <span class="amount">¥${freeIndex === i ? '免单' : perPerson.toFixed(2)}</span>
+          `;
+          personDivs.push(div);
+        }
+        resultPerson.innerHTML = '';
+        personDivs.forEach(div => resultPerson.appendChild(div));
+      }
+
+      // 清空
+      clearBtn.addEventListener('click', function() {
+        totalAmountInput.value = '';
+        personCountInput.value = '';
+        hasServiceFee.checked = false;
+        serviceFeeExtra.classList.remove('show');
+        hasFreePerson.checked = false;
+        freePersonExtra.classList.remove('show');
+        freePersonIndex = null;
+        personSelector.innerHTML = '';
+        showEmpty();
+        totalAmountInput.focus();
+      });
+
+      // 页面关闭时清空（无历史痕迹）
+      window.addEventListener('beforeunload', function() {
+        totalAmountInput.value = '';
+        personCountInput.value = '';
+      });
+
+      // 初始化
+      updatePersonSelector();
+    })();
+  </script>
+</body>
+</html>
